@@ -1,0 +1,16 @@
+.boton-menu {
+    -fx-background-color: #6c1d23;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-font-family: Marcellus;
+    -fx-font-size: 15;
+}
+
+.boton-menu:hover {
+    -fx-background-color: #bd363d; /* Un color un poco más claro o diferente */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0); /* Sombra suave */
+}
+
+.boton-menu:pressed {
+    -fx-background-color: #50151a; /* Más oscuro al hacer click */
+}

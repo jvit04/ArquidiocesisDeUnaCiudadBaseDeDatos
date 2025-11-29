@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="ancorPane1" maxHeight="400.0" maxWidth="600.0" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ArquidiocesisController">
+   <children>
+      <ImageView fx:id="gifCatedral" fitHeight="400.0" fitWidth="310.0" layoutX="385.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@imagenes/arquidiocesisGif.gif" />
+         </image>
+      </ImageView>
+      <Rectangle fx:id="rectanguloFondo" arcHeight="5.0" arcWidth="5.0" fill="#e5d9c7" height="400.0" stroke="#e5d9c7" strokeType="INSIDE" width="385.0" />
+      <Rectangle fx:id="rectanguloInicio" arcHeight="5.0" arcWidth="5.0" fill="#6c1d23" height="400.0" stroke="#6c1d23" strokeType="INSIDE" width="44.0" />
+      <Label fx:id="labelArquidiocesis1" layoutX="90.0" layoutY="160.0" text="Arquidiócesis" textAlignment="CENTER" textFill="#6c1d23" visible="false">
+         <font>
+            <Font name="Cinzel Regular" size="33.0" />
+         </font>
+         <effect>
+            <Blend />
+         </effect>
+      </Label>
+      <Rectangle fx:id="rectanguloFondo1" arcHeight="5.0" arcWidth="5.0" fill="#e5d9c7" height="400.0" layoutX="138.0" stroke="#e5d9c7" strokeType="INSIDE" width="466.0" />
+      <Button fx:id="botonIniciar" layoutX="159.0" layoutY="224.0" mnemonicParsing="false" onAction="#mostrarMenu" prefWidth="110.0" styleClass="boton-elegante" stylesheets="@botonesSueltosArquidiocesis.css" text="Iniciar" visible="false">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="Roboto Regular" size="15.0" />
+         </font></Button>
+      <Rectangle fx:id="rectanguloMenu" arcHeight="5.0" arcWidth="5.0" fill="#6c1d23" height="400.0" layoutX="-4.0" layoutY="1.0" stroke="#6c1d23" strokeType="INSIDE" width="152.0" />
+      <VBox fx:id="menuBotones" layoutX="5.0" layoutY="9.0" prefHeight="392.0" prefWidth="142.0">
+         <children>
+            <Button fx:id="botonRegresoInicio" mnemonicParsing="false" onAction="#regresarInicio" prefHeight="83.0" prefWidth="144.0" styleClass="boton-menu" stylesheets="@botonesMenu.css" text="Inicio">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+            <Button fx:id="botonMenuProceso" mnemonicParsing="false" onAction="#crearParroquia" prefHeight="83.0" prefWidth="144.0" styleClass="boton-menu" stylesheets="@botonesMenu.css" text="Registro">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+            <Button fx:id="botonMenuSubirArchivo" mnemonicParsing="false" onAction="#subirArchivosMenu" prefHeight="83.0" prefWidth="144.0" styleClass="boton-menu" stylesheets="@botonesMenu.css" text="Subir Archivos">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+            <Button fx:id="botonMenuReporte" mnemonicParsing="false" onAction="#generarReporte" prefHeight="83.0" prefWidth="144.0" styleClass="boton-menu" stylesheets="@botonesMenu.css" text="Generar Reporte">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+         </children>
+      </VBox>
+      <Label fx:id="labelArquidiocesis2" layoutX="245.0" layoutY="40.0" text="Arquidiócesis" textAlignment="CENTER" textFill="#6c1d23">
+         <font>
+            <Font name="Cinzel Regular" size="33.0" />
+         </font>
+      </Label>
+      <Rectangle fx:id="rectanguloMargenIzq" arcHeight="5.0" arcWidth="5.0" fill="#9d7a3d" height="409.0" layoutX="-5.0" layoutY="-3.0" stroke="#9d7a3d" strokeType="INSIDE" width="10.0" />
+      <Rectangle fx:id="rectanguloMargenDer" arcHeight="5.0" arcWidth="5.0" fill="#9d7a3d" height="409.0" layoutX="594.0" layoutY="1.0" stroke="#9d7a3d" strokeType="INSIDE" width="10.0" />
+      <Rectangle fx:id="RectanguloMargenInf" arcHeight="5.0" arcWidth="5.0" fill="#9d7a3d" height="20.0" layoutX="-3.0" layoutY="389.0" stroke="#9d7a3d" strokeType="INSIDE" width="606.0" />
+      <Rectangle fx:id="rectanguloMargenSup" arcHeight="5.0" arcWidth="5.0" fill="#9d7a3d" height="10.0" layoutX="-3.0" stroke="#9d7a3d" strokeType="INSIDE" width="606.0" />
+      <Label fx:id="labelSeleccione" layoutX="173.0" layoutY="114.0" text="Seleccione en el menú lo que desee realizar" textAlignment="CENTER">
+         <font>
+            <Font name="Marcellus" size="20.0" />
+         </font>
+      </Label>
+      <Button fx:id="botonExaminar" layoutX="223.0" layoutY="245.0" mnemonicParsing="false" onMouseEntered="#cambiarLabelExaminar" onMouseExited="#regresarLabelExaminar" prefHeight="42.0" prefWidth="110.0" styleClass="boton-elegante" stylesheets="@botonesSueltosArquidiocesis.css" text="Examinar" visible="false">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="Roboto Regular" size="15.0" />
+         </font>
+      </Button>
+      <TextField fx:id="textFieldRutaArchivo" editable="false" layoutX="233.0" layoutY="192.0" prefHeight="26.0" prefWidth="271.0" promptText="Ruta del Archivo" visible="false" />
+      <Button fx:id="botonSubir" layoutX="402.0" layoutY="245.0" mnemonicParsing="false" onMouseEntered="#cambiarLabelSubir" onMouseExited="#regresarLabelSubir" prefHeight="42.0" prefWidth="110.0" styleClass="boton-elegante" stylesheets="@botonesSueltosArquidiocesis.css" text="Subir" visible="false">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="Roboto Regular" size="15.0" />
+         </font>
+      </Button>
+      <Label fx:id="labelDinamico" layoutX="280.0" layoutY="151.0" text="Elija el archivo a subir." visible="false">
+         <font>
+            <Font name="Roboto Regular" size="18.0" />
+         </font>
+      </Label>
+      <ImageView fx:id="imageCatedral" fitHeight="216.0" fitWidth="226.0" layoutX="263.0" layoutY="151.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@IconoCatedral.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>
