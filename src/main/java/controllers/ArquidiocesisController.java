@@ -9,8 +9,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.control.TableView;
 
 public class ArquidiocesisController {
+    @FXML
+    private TableView<?> tablaReporte;
+    @FXML
+    private Button botonDescargar;
 
     @FXML
     private Rectangle RectanguloMargenInf;
@@ -124,6 +129,8 @@ public class ArquidiocesisController {
         imageCatedral.setVisible(false);
         labelSeleccione.setLayoutX(173);
         labelSeleccione.setText("Seleccione en el menú lo que desee realizar");
+        tablaReporte.setVisible(false);
+        botonDescargar.setVisible(false);
     }
 
     @FXML
@@ -136,7 +143,8 @@ public class ArquidiocesisController {
         botonSubir.setVisible(false);
         textFieldRutaArchivo.setText("");
         imageCatedral.setVisible(false);
-    }
+        tablaReporte.setVisible(false);
+        botonDescargar.setVisible(false);    }
 
     @FXML
     void generarReporte(ActionEvent event) {
@@ -149,7 +157,9 @@ public class ArquidiocesisController {
         botonExaminar.setVisible(false);
         botonSubir.setVisible(false);
         textFieldRutaArchivo.setText("");
-        imageCatedral.setVisible(true);
+        imageCatedral.setVisible(false);
+        tablaReporte.setVisible(true);
+        botonDescargar.setVisible(true);
     }
     @FXML
     void subirArchivosMenu(ActionEvent event) {
@@ -161,6 +171,8 @@ public class ArquidiocesisController {
         botonExaminar.setVisible(true);
         botonSubir.setVisible(true);
         imageCatedral.setVisible(false);
+        tablaReporte.setVisible(false);
+        botonDescargar.setVisible(false);
 
     }
     @FXML
@@ -188,6 +200,8 @@ public class ArquidiocesisController {
         labelDinamico.setLayoutX(282);
 
     }
+
+
 
 
 

@@ -2,5 +2,5 @@ package utilities;
 
 public class Paths {
     public static final String ArquidiocesisApp = "/iniciar.fxml";
-    public static final String ImagenIconoApp = "/IconoCatedral.png";
+    public static final String ImagenIconoApp = "/imagenes/IconoCatedral.png";
 }
