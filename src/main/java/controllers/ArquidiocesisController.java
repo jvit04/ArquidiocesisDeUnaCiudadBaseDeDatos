@@ -1,34 +1,35 @@
 package controllers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.control.TableView;
 import javafx.scene.text.Font;
 
 public class ArquidiocesisController {
     @FXML
-    private TableView<?> tablaReporte;
-    @FXML
-    private Button botonDescargar;
+    private Rectangle rectanguloMargenInf;
 
     @FXML
-    private Rectangle RectanguloMargenInf;
+    private TextField registrotextFieldDireccion;
 
     @FXML
     private AnchorPane ancorPane1;
+
+    @FXML
+    private Button botonDescargar;
 
     @FXML
     private Button botonExaminar;
 
     @FXML
     private Button botonIniciar;
+    @FXML
+    private Label labelArquidiocesis3;
+
 
     @FXML
     private Button botonMenuProceso;
@@ -47,6 +48,9 @@ public class ArquidiocesisController {
 
     @FXML
     private ImageView gifCatedral;
+
+    @FXML
+    private ImageView imageCatedral;
 
     @FXML
     private Label labelArquidiocesis1;
@@ -83,11 +87,69 @@ public class ArquidiocesisController {
 
     @FXML
     private Rectangle rectanguloMenu;
+
     @FXML
-    private ImageView imageCatedral;
+    private Button registroBotonEnviar;
+
+    @FXML
+    private Label registroLabelCiudadPertenece;
+
+    @FXML
+    private DatePicker registroDatePickerFF;
+
+    @FXML
+    private Label registroLabelDescripcion;
+
+    @FXML
+    private Label registroLabelDireccionParroquia;
+
+    @FXML
+    private Label registroLabelEmail;
+
+    @FXML
+    private Label registroLabelFechaF;
+
+    @FXML
+    private Label registroLabelNombreParroquia;
+
+    @FXML
+    private Label registroLabelParroco;
+
+    @FXML
+    private Label registroLabelSitioWeb;
+
+    @FXML
+    private Label registroLabelTelefono;
+
+    @FXML
+    private Label registroLabelVicaria;
+
+    @FXML
+    private TextField registroTextFieldCiudad;
+
+    @FXML
+    private TextField registroTextFieldVicaria;
+
+    @FXML
+    private TextField registroTxtFieldEmail;
+
+    @FXML
+    private TextField registroTxtFieldSitioWeb;
+
+    @FXML
+    private TextField registroTxtFieldTelefono;
+
+    @FXML
+    private TextField registroTextFieldParroco;
+
+    @FXML
+    private TableView<?> tablaReporte;
 
     @FXML
     private TextField textFieldRutaArchivo;
+
+    @FXML
+    private TextField txtFieldNombreParroquia;
     @FXML
     void mostrarMenu(ActionEvent event) {
         labelArquidiocesis2.setVisible(true);
@@ -132,6 +194,28 @@ public class ArquidiocesisController {
         labelSeleccione.setText("Seleccione en el menú lo que desee realizar");
         tablaReporte.setVisible(false);
         botonDescargar.setVisible(false);
+        //Objetos de Registro
+        labelArquidiocesis3.setVisible(false);
+        registroLabelDescripcion.setVisible(false);
+        registroLabelNombreParroquia.setVisible(false);
+        txtFieldNombreParroquia.setVisible(false);
+        registroLabelVicaria.setVisible(false);
+        registroTextFieldVicaria.setVisible(false);
+        registroLabelCiudadPertenece.setVisible(false);
+        registroTextFieldCiudad.setVisible(false);
+        registroLabelDireccionParroquia.setVisible(false);
+        registrotextFieldDireccion.setVisible(false);
+        registroLabelParroco.setVisible(false);
+        registroTextFieldParroco.setVisible(false);
+        registroLabelTelefono.setVisible(false);
+        registroTxtFieldTelefono.setVisible(false);
+        registroLabelSitioWeb.setVisible(false);
+        registroTxtFieldSitioWeb.setVisible(false);
+        registroLabelEmail.setVisible(false);
+        registroTxtFieldEmail.setVisible(false);
+        registroLabelFechaF.setVisible(false);
+        registroDatePickerFF.setVisible(false);
+        registroBotonEnviar.setVisible(false);
     }
 
     @FXML
@@ -146,15 +230,36 @@ public class ArquidiocesisController {
         imageCatedral.setVisible(false);
         tablaReporte.setVisible(false);
         botonDescargar.setVisible(false);
-        labelDinamico.setFont(new Font(25));
+        //Objetos de Registro
+        labelArquidiocesis2.setVisible(false);
+        labelArquidiocesis3.setVisible(true);
+        registroLabelDescripcion.setVisible(true);
+        registroLabelNombreParroquia.setVisible(true);
+        txtFieldNombreParroquia.setVisible(true);
+        registroLabelVicaria.setVisible(true);
+        registroTextFieldVicaria.setVisible(true);
+        registroLabelCiudadPertenece.setVisible(true);
+        registroTextFieldCiudad.setVisible(true);
+        registroLabelDireccionParroquia.setVisible(true);
+        registrotextFieldDireccion.setVisible(true);
+        registroLabelParroco.setVisible(true);
+        registroTextFieldParroco.setVisible(true);
+        registroLabelTelefono.setVisible(true);
+        registroTxtFieldTelefono.setVisible(true);
+        registroLabelSitioWeb.setVisible(true);
+        registroTxtFieldSitioWeb.setVisible(true);
+        registroLabelEmail.setVisible(true);
+        registroTxtFieldEmail.setVisible(true);
+        registroLabelFechaF.setVisible(true);
+        registroDatePickerFF.setVisible(true);
+        registroBotonEnviar.setVisible(true);
+
     }
 
     @FXML
     void generarReporte(ActionEvent event) {
-        labelSeleccione.setLayoutX(182);
-        labelSeleccione.setText("El reporte ha sido generado exitosamente");
-        labelSeleccione.setVisible(true);
-        labelArquidiocesis2.setLayoutY(40);
+        labelSeleccione.setVisible(false);
+        labelArquidiocesis2.setLayoutY(24);
         labelDinamico.setVisible(false);
         textFieldRutaArchivo.setVisible(false);
         botonExaminar.setVisible(false);
@@ -163,7 +268,29 @@ public class ArquidiocesisController {
         imageCatedral.setVisible(false);
         tablaReporte.setVisible(true);
         botonDescargar.setVisible(true);
-        labelArquidiocesis2.setFont(new Font(33));
+        //Objetos de Registro
+        labelArquidiocesis2.setVisible(true);
+        labelArquidiocesis3.setVisible(false);
+        registroLabelDescripcion.setVisible(false);
+        registroLabelNombreParroquia.setVisible(false);
+        txtFieldNombreParroquia.setVisible(false);
+        registroLabelVicaria.setVisible(false);
+        registroTextFieldVicaria.setVisible(false);
+        registroLabelCiudadPertenece.setVisible(false);
+        registroTextFieldCiudad.setVisible(false);
+        registroLabelDireccionParroquia.setVisible(false);
+        registrotextFieldDireccion.setVisible(false);
+        registroLabelParroco.setVisible(false);
+        registroTextFieldParroco.setVisible(false);
+        registroLabelTelefono.setVisible(false);
+        registroTxtFieldTelefono.setVisible(false);
+        registroLabelSitioWeb.setVisible(false);
+        registroTxtFieldSitioWeb.setVisible(false);
+        registroLabelEmail.setVisible(false);
+        registroTxtFieldEmail.setVisible(false);
+        registroLabelFechaF.setVisible(false);
+        registroDatePickerFF.setVisible(false);
+        registroBotonEnviar.setVisible(false);
 
     }
     @FXML
@@ -178,8 +305,29 @@ public class ArquidiocesisController {
         imageCatedral.setVisible(false);
         tablaReporte.setVisible(false);
         botonDescargar.setVisible(false);
-        labelDinamico.setFont(new Font(33));
-
+//Objetos de Registro
+        labelArquidiocesis2.setVisible(true);
+        labelArquidiocesis3.setVisible(false);
+        registroLabelDescripcion.setVisible(false);
+        registroLabelNombreParroquia.setVisible(false);
+        txtFieldNombreParroquia.setVisible(false);
+        registroLabelVicaria.setVisible(false);
+        registroTextFieldVicaria.setVisible(false);
+        registroLabelCiudadPertenece.setVisible(false);
+        registroTextFieldCiudad.setVisible(false);
+        registroLabelDireccionParroquia.setVisible(false);
+        registrotextFieldDireccion.setVisible(false);
+        registroLabelParroco.setVisible(false);
+        registroTextFieldParroco.setVisible(false);
+        registroLabelTelefono.setVisible(false);
+        registroTxtFieldTelefono.setVisible(false);
+        registroLabelSitioWeb.setVisible(false);
+        registroTxtFieldSitioWeb.setVisible(false);
+        registroLabelEmail.setVisible(false);
+        registroTxtFieldEmail.setVisible(false);
+        registroLabelFechaF.setVisible(false);
+        registroDatePickerFF.setVisible(false);
+        registroBotonEnviar.setVisible(false);
 
     }
     @FXML

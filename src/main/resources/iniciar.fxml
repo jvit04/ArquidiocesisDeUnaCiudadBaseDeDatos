@@ -2,6 +2,7 @@
 
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -61,14 +62,14 @@
                </cursor></Button>
          </children>
       </VBox>
-      <Label fx:id="labelArquidiocesis2" layoutX="275.0" layoutY="24.0" text="Arquidiócesis" textAlignment="CENTER" textFill="#2f3e28">
+      <Label fx:id="labelArquidiocesis2" layoutX="274.0" layoutY="24.0" text="Arquidiócesis" textAlignment="CENTER" textFill="#2f3e28" visible="false">
          <font>
-            <Font name="Cinzel Regular" size="25.0" />
+            <Font name="Cinzel Regular" size="33.0" />
          </font>
       </Label>
       <Rectangle fx:id="rectanguloMargenIzq" arcHeight="5.0" arcWidth="5.0" fill="#c5a059" height="409.0" layoutX="-5.0" layoutY="-3.0" stroke="#c5a059" strokeType="INSIDE" width="10.0" />
       <Rectangle fx:id="rectanguloMargenDer" arcHeight="5.0" arcWidth="5.0" fill="#c5a059" height="409.0" layoutX="594.0" layoutY="1.0" stroke="#c5a059" strokeType="INSIDE" width="10.0" />
-      <Rectangle fx:id="RectanguloMargenInf" arcHeight="5.0" arcWidth="5.0" fill="#c5a059" height="20.0" layoutX="-3.0" layoutY="389.0" stroke="#c5a059" strokeType="INSIDE" width="606.0" />
+      <Rectangle fx:id="rectanguloMargenInf" arcHeight="5.0" arcWidth="5.0" fill="#c5a059" height="20.0" layoutX="-3.0" layoutY="389.0" stroke="#c5a059" strokeType="INSIDE" width="606.0" />
       <Rectangle fx:id="rectanguloMargenSup" arcHeight="5.0" arcWidth="5.0" fill="#c5a059" height="10.0" layoutX="-3.0" stroke="#c5a059" strokeType="INSIDE" width="606.0" />
       <Label fx:id="labelSeleccione" layoutX="173.0" layoutY="114.0" text="Seleccione en el menú lo que desee realizar" textAlignment="CENTER" visible="false">
          <font>
@@ -123,48 +124,59 @@
             <Font name="Marcellus" size="12.0" />
          </font>
       </Label>
-      <Label fx:id="registroLabelDescripcion11" layoutX="178.0" layoutY="151.0" text="Vicaria a la que pertenece">
+      <Label fx:id="registroLabelVicaria" layoutX="178.0" layoutY="151.0" text="Vicaria a la que pertenece">
          <font>
             <Font name="Marcellus" size="12.0" />
          </font>
       </Label>
-      <TextField layoutX="181.0" layoutY="170.0" />
-      <Label fx:id="registroLabelDescripcion111" layoutX="181.0" layoutY="209.0" text="Ciudad de la Parroquia">
+      <TextField fx:id="registroTextFieldVicaria" layoutX="175.0" layoutY="170.0" />
+      <Label fx:id="registroLabelCiudadPertenece" layoutX="178.0" layoutY="209.0" text="Ciudad de la Parroquia">
          <font>
             <Font name="Marcellus" size="12.0" />
          </font>
       </Label>
-      <TextField layoutX="180.0" layoutY="231.0" />
-      <Label fx:id="registroLabelDescripcion1111" layoutX="180.0" layoutY="266.0" text="Dirección de la Parroquia">
+      <TextField fx:id="registroTextFieldCiudad" layoutX="175.0" layoutY="231.0" />
+      <Label fx:id="registroLabelDireccionParroquia" layoutX="178.0" layoutY="266.0" text="Dirección de la Parroquia">
          <font>
             <Font name="Marcellus" size="12.0" />
          </font>
       </Label>
-      <TextField layoutX="181.0" layoutY="287.0" />
-      <Label fx:id="registroLabelDescripcion12" layoutX="402.0" layoutY="154.0" text="Sitio Web">
+      <TextField fx:id="registrotextFieldDireccion" layoutX="175.0" layoutY="287.0" />
+      <Label fx:id="registroLabelSitioWeb" layoutX="402.0" layoutY="154.0" text="Sitio Web">
          <font>
             <Font name="Marcellus" size="12.0" />
          </font>
       </Label>
-      <TextField layoutX="400.0" layoutY="114.0" />
-      <Label fx:id="registroLabelDescripcion121" layoutX="402.0" layoutY="96.0" text="Telefono">
+      <TextField fx:id="registroTxtFieldTelefono" layoutX="400.0" layoutY="114.0" />
+      <Label fx:id="registroLabelTelefono" layoutX="402.0" layoutY="96.0" text="Telefono">
          <font>
             <Font name="Marcellus" size="12.0" />
          </font>
       </Label>
-      <TextField layoutX="400.0" layoutY="172.0" />
-      <Label fx:id="registroLabelDescripcion122" layoutX="400.0" layoutY="209.0" text="Email">
+      <TextField fx:id="registroTxtFieldSitioWeb" layoutX="400.0" layoutY="172.0" />
+      <Label fx:id="registroLabelEmail" layoutX="402.0" layoutY="209.0" text="Email">
          <font>
             <Font name="Marcellus" size="12.0" />
          </font>
       </Label>
-      <TextField layoutX="400.0" layoutY="231.0" />
-      <Label fx:id="registroLabelDescripcion1221" layoutX="401.0" layoutY="266.0" text="Fecha de Fundación">
+      <TextField fx:id="registroTxtFieldEmail" layoutX="400.0" layoutY="231.0" />
+      <Label fx:id="registroLabelFechaF" layoutX="402.0" layoutY="266.0" text="Fecha de Fundación">
          <font>
             <Font name="Marcellus" size="12.0" />
          </font>
       </Label>
-      <TextField layoutX="400.0" layoutY="287.0" />
-      <Button layoutX="313.0" layoutY="330.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="100.0" styleClass="boton-elegante" stylesheets="@botonesSueltosArquidiocesis.css" text="Enviar" />
+      <TextField fx:id="registroTextFieldParroco" layoutX="175.0" layoutY="344.0" />
+      <Button fx:id="registroBotonEnviar" layoutX="419.0" layoutY="330.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="100.0" styleClass="boton-elegante" stylesheets="@botonesSueltosArquidiocesis.css" text="Enviar" />
+      <Label fx:id="registroLabelParroco" layoutX="178.0" layoutY="325.0" text="Nombre del Parroco">
+         <font>
+            <Font name="Marcellus" size="12.0" />
+         </font>
+      </Label>
+      <DatePicker fx:id="registroDatePickerFF" layoutX="400.0" layoutY="286.0" prefHeight="26.0" prefWidth="152.0" />
+      <Label fx:id="labelArquidiocesis3" layoutX="274.0" layoutY="24.0" text="Arquidiócesis" textAlignment="CENTER" textFill="#2f3e28">
+         <font>
+            <Font name="Cinzel Regular" size="25.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
