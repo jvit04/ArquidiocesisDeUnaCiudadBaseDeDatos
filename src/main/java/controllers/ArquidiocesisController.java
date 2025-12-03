@@ -10,6 +10,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.control.TableView;
+import javafx.scene.text.Font;
 
 public class ArquidiocesisController {
     @FXML
@@ -136,7 +137,7 @@ public class ArquidiocesisController {
     @FXML
     void crearParroquia(ActionEvent event) {
         labelSeleccione.setVisible(false);
-        labelArquidiocesis2.setLayoutY(14);
+        labelArquidiocesis2.setLayoutY(20);
         labelDinamico.setVisible(false);
         textFieldRutaArchivo.setVisible(false);
         botonExaminar.setVisible(false);
@@ -144,7 +145,9 @@ public class ArquidiocesisController {
         textFieldRutaArchivo.setText("");
         imageCatedral.setVisible(false);
         tablaReporte.setVisible(false);
-        botonDescargar.setVisible(false);    }
+        botonDescargar.setVisible(false);
+        labelDinamico.setFont(new Font(25));
+    }
 
     @FXML
     void generarReporte(ActionEvent event) {
@@ -160,6 +163,8 @@ public class ArquidiocesisController {
         imageCatedral.setVisible(false);
         tablaReporte.setVisible(true);
         botonDescargar.setVisible(true);
+        labelArquidiocesis2.setFont(new Font(33));
+
     }
     @FXML
     void subirArchivosMenu(ActionEvent event) {
@@ -173,6 +178,8 @@ public class ArquidiocesisController {
         imageCatedral.setVisible(false);
         tablaReporte.setVisible(false);
         botonDescargar.setVisible(false);
+        labelDinamico.setFont(new Font(33));
+
 
     }
     @FXML
