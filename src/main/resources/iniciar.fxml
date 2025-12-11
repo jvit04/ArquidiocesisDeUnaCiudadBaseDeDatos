@@ -3,6 +3,7 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
@@ -172,7 +173,6 @@
             <Font name="Marcellus" size="12.0" />
          </font>
       </Label>
-      <TextField fx:id="registroTextFieldParroco" layoutX="175.0" layoutY="344.0" visible="false" />
       <Button fx:id="registroBotonEnviar" layoutX="419.0" layoutY="330.0" mnemonicParsing="false" onAction="#EnviarDatosParroquia" prefHeight="38.0" prefWidth="100.0" styleClass="boton-elegante" stylesheets="@botonesSueltosArquidiocesis.css" text="Enviar" visible="false" />
       <Label fx:id="registroLabelParroco" layoutX="178.0" layoutY="325.0" text="Nombre del Parroco" visible="false">
          <font>
@@ -185,6 +185,7 @@
             <Font name="Cinzel Regular" size="25.0" />
          </font>
       </Label>
-      <ChoiceBox fx:id="registroChoiceBoxVicaria" layoutX="174.0" layoutY="172.0" prefWidth="150.0" />
+      <ChoiceBox fx:id="registroChoiceBoxVicaria" layoutX="174.0" layoutY="172.0" prefWidth="150.0" visible="false" />
+      <ComboBox fx:id="registroComboBoxParroco" layoutX="175.0" layoutY="344.0" prefWidth="150.0" visible="false" />
    </children>
 </AnchorPane>

@@ -4,27 +4,25 @@ import java.time.LocalDate;
 
 public class Parroquia {
     public String nombre;
-    public String vicaria;
+    public int vicaria;
     public String ciudad;
     public String direccion;
-    public String parroco;
-    public String telefono;
-    public String sitioWeb;
-    public String email;
     public LocalDate fechaFundacion;
+    public int parroco;
+    public String telefono;
+    public String email;
+    public String sitioWeb;
 
-    public Parroquia(String nombre, String vicaria, String ciudad, String direccion,
-                     String parroco, String telefono, String sitioWeb, String email,
-                     LocalDate fechaFundacion) {
+    public Parroquia(String nombre, int vicaria, String ciudad, String direccion, LocalDate fechaFundacion, int parroco, String telefono, String email, String sitioWeb) {
         this.nombre = nombre;
         this.vicaria = vicaria;
         this.ciudad = ciudad;
         this.direccion = direccion;
+        this.fechaFundacion = fechaFundacion;
         this.parroco = parroco;
         this.telefono = telefono;
-        this.sitioWeb = sitioWeb;
         this.email = email;
-        this.fechaFundacion = fechaFundacion;
+        this.sitioWeb = sitioWeb;
     }
 
     public String getNombre() {
@@ -35,11 +33,11 @@ public class Parroquia {
         this.nombre = nombre;
     }
 
-    public String getVicaria() {
+    public int getVicaria() {
         return vicaria;
     }
 
-    public void setVicaria(String vicaria) {
+    public void setVicaria(int vicaria) {
         this.vicaria = vicaria;
     }
 
@@ -59,11 +57,11 @@ public class Parroquia {
         this.direccion = direccion;
     }
 
-    public String getParroco() {
+    public int getParroco() {
         return parroco;
     }
 
-    public void setParroco(String parroco) {
+    public void setParroco(int parroco) {
         this.parroco = parroco;
     }
 

@@ -1,40 +1,36 @@
 package application;
 
 import utilities.ConexionBD;
+
+import javax.swing.*;
 import java.io.*;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 
-public class GuardarParroquiaSQL {
+public interface GuardarParroquiaSQL {
 
 
 
-    public static void guardarEnSQL(Parroquia p) {
-        String sql = "INSERT INTO parroquias (nombre, vicaria, ciudad, direccion, parroco, telefono, sitio_web, email, fecha_fundacion) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    static void guardarEnSQL(Parroquia p) {
+        String sql = "select registro_parroquias(?,?,?,?,?,?,?,?::DATE,?)";
 
         try (Connection connection = ConexionBD.conectar();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, p.getNombre());
-            ps.setString(2, p.getVicaria());
-            ps.setString(3, p.getCiudad());
-            ps.setString(4, p.getDireccion());
-            ps.setString(5, p.getParroco());
-            ps.setString(6, p.getTelefono());
+            ps.setInt(2, p.getVicaria());
+            ps.setString(3, p.getDireccion());
+            ps.setString(4, p.getCiudad());
+            ps.setString(5, p.getTelefono());
+            ps.setString(6, p.getEmail());
             ps.setString(7, p.getSitioWeb());
-            ps.setString(8, p.getEmail());
+            ps.setDate(8, Date.valueOf(p.getFechaFundacion()));
+            ps.setInt(9, p.getParroco());
 
-            ps.setDate(9, Date.valueOf(p.getFechaFundacion()));
-
-            //Inserción
-            int filasAfectadas = ps.executeUpdate();
-
-            if (filasAfectadas > 0) {
-                System.out.println("Parroquia guardada exitosamente en la base de datos.");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String mensajeDeLaBase = rs.getString(1);
+               JOptionPane.showMessageDialog(null,mensajeDeLaBase);
             }
 
         } catch (SQLException e) {

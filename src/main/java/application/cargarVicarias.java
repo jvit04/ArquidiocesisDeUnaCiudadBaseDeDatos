@@ -1,0 +1,39 @@
+package application;
+
+import utilities.Paths;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public interface cargarVicarias {
+    default List<Vicaria> cargarVicarias(){
+        List<Vicaria> vicarias = new ArrayList<>();
+
+
+        String sql = "SELECT * FROM obtener_vicarias()";
+        try (Connection conn = DriverManager.getConnection(Paths.UrlBaseDatos, Paths.USER, Paths.PASSWORD);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+
+                int idDesdeBD = rs.getInt("p_id_vicaria");
+                String nombresDesdeBD = rs.getString("p_nombre_vicaria");
+
+
+
+                Vicaria vicaria = new Vicaria(idDesdeBD, nombresDesdeBD);
+
+
+                vicarias.add(vicaria);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return vicarias;
+    }
+}
+

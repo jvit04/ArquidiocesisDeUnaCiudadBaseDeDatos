@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.sql.*;
 
-import application.GuardarParroquiaSQL;
-import application.Parroquia;
+import application.*;
+import javafx.scene.control.ComboBox;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -27,10 +27,11 @@ import utilities.RegexPatterns;
 import javafx.scene.control.ChoiceBox;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class ArquidiocesisController {
+public class ArquidiocesisController implements cargarClerigos, GuardarParroquiaSQL , cargarVicarias {
     @FXML
     private AnchorPane ancorPane1;
 
@@ -113,18 +114,6 @@ public class ArquidiocesisController {
     private Rectangle rectanguloInicio;
 
     @FXML
-    private Rectangle rectanguloMargenDer;
-
-    @FXML
-    private Rectangle rectanguloMargenInf;
-
-    @FXML
-    private Rectangle rectanguloMargenIzq;
-
-    @FXML
-    private Rectangle rectanguloMargenSup;
-
-    @FXML
     private Rectangle rectanguloMenu;
 
     @FXML
@@ -167,10 +156,10 @@ public class ArquidiocesisController {
     private TextField registroTextFieldCiudad;
 
     @FXML
-    private TextField registroTextFieldParroco;
+    private ComboBox<Clerigo> registroComboBoxParroco;
 
     @FXML
-    private ChoiceBox<String> registroChoiceBoxVicaria;
+    private ChoiceBox<Vicaria> registroChoiceBoxVicaria;
 
     @FXML
     private TextField registroTxtFieldEmail;
@@ -199,9 +188,15 @@ public class ArquidiocesisController {
     @FXML
     private TextField txtFieldNombreParroquia;
 
-    private String nombreArchivo;
+
 
     private File archivoSeleccionado;
+
+
+    void setRegistroComboBoxParroco(){
+        registroComboBoxParroco.getItems().addAll(cargarClerigos());
+    }
+
     @FXML
     void mostrarMenu(ActionEvent event) {
         labelArquidiocesis2.setVisible(true);
@@ -224,7 +219,7 @@ public class ArquidiocesisController {
 
     @FXML
     void initialize(){
-
+        setRegistroComboBoxParroco();
         labelArquidiocesis2.setVisible(false);
         labelArquidiocesis1.setVisible(true);
         gifCatedral.setVisible(true);
@@ -259,7 +254,7 @@ public class ArquidiocesisController {
         registroLabelDireccionParroquia.setVisible(false);
         registrotextFieldDireccion.setVisible(false);
         registroLabelParroco.setVisible(false);
-        registroTextFieldParroco.setVisible(false);
+        registroComboBoxParroco.setVisible(false);
         registroLabelTelefono.setVisible(false);
         registroTxtFieldTelefono.setVisible(false);
         registroLabelSitioWeb.setVisible(false);
@@ -270,15 +265,16 @@ public class ArquidiocesisController {
         registroDatePickerFF.setVisible(false);
         registroBotonEnviar.setVisible(false);
 
-        registroChoiceBoxVicaria.getItems().addAll(
-                "Vicaria Norte",
-                "Vicaria Sur",
-                "Vicaria Centro",
-                "Vicaría Daule-Samborondón",
-                "Vicaria Santa Elena",
-                "Vicaria Durán",
-                "Vicaria Noreste"
-        );
+        registroChoiceBoxVicaria.getItems().addAll(cargarVicarias());
+        registroChoiceBoxVicaria.getSelectionModel().selectFirst();
+        txtFieldNombreParroquia.setText("");
+        registroTextFieldCiudad.setText("");
+        registroComboBoxParroco.setValue(null);
+        registrotextFieldDireccion.setText("");
+        registroTxtFieldTelefono.setText("");
+        registroTxtFieldSitioWeb.setText("");
+        registroTxtFieldEmail.setText("");
+        registroDatePickerFF.setValue(null);
 
 //
 //        idParroquia.setCellValueFactory(new PropertyValueFactory<>("idParroquia"));
@@ -291,6 +287,7 @@ public class ArquidiocesisController {
 //        fecha_ereccion.setCellValueFactory(new PropertyValueFactory<>("fechaEreccion"));
 //        id_vicaria.setCellValueFactory(new PropertyValueFactory<>("idVicaria"));
 
+
         try {
             cargarTabla();
         } catch (SQLException e) {
@@ -300,6 +297,7 @@ public class ArquidiocesisController {
 
     @FXML
     void crearParroquia(ActionEvent event) {
+        registroComboBoxParroco.getSelectionModel().selectFirst();
         labelSeleccione.setVisible(false);
         labelArquidiocesis2.setLayoutY(20);
         labelDinamico.setVisible(false);
@@ -323,7 +321,7 @@ public class ArquidiocesisController {
         registroLabelDireccionParroquia.setVisible(true);
         registrotextFieldDireccion.setVisible(true);
         registroLabelParroco.setVisible(true);
-        registroTextFieldParroco.setVisible(true);
+        registroComboBoxParroco.setVisible(true);
         registroLabelTelefono.setVisible(true);
         registroTxtFieldTelefono.setVisible(true);
         registroLabelSitioWeb.setVisible(true);
@@ -339,10 +337,10 @@ public class ArquidiocesisController {
     void EnviarDatosParroquia(ActionEvent event) {
      //Validación de campos
         String nombreParroquia = txtFieldNombreParroquia.getText();
-        String vicaria = registroChoiceBoxVicaria.getValue();
+        int vicaria = registroChoiceBoxVicaria.getValue().getIdVicaria();
         String ciudad = registroTextFieldCiudad.getText();
         String direccion = registrotextFieldDireccion.getText();
-        String parroco = registroTextFieldParroco.getText();
+        int parroco = registroComboBoxParroco.getValue().getId_clerigo();
         String telefono = registroTxtFieldTelefono.getText();
         String sitioWeb = registroTxtFieldSitioWeb.getText();
         String email = registroTxtFieldEmail.getText();
@@ -352,67 +350,68 @@ public class ArquidiocesisController {
 
 
                  if (nombreParroquia == null || nombreParroquia.trim().isEmpty()
-                         || vicaria == null || vicaria.trim().isEmpty()
                          || ciudad == null || ciudad.trim().isEmpty()
                          || direccion == null || direccion.trim().isEmpty()
-                         || parroco == null || parroco.trim().isEmpty()
-                         || telefono == null || telefono.trim().isEmpty()
-                         || sitioWeb == null || sitioWeb.trim().isEmpty()
-                         || email == null || email.trim().isEmpty()
                          || fechaFundacion == null
                  ) {
-                    mostrarAlerta("Error","Rellene todos los campos.");
+                    mostrarAlerta("Error","Rellene los campos necesarios.");
                      return;
                 }
+                 if (telefono.trim().isEmpty()){
+                     telefono =null;
+                 }
+                 if (sitioWeb.trim().isEmpty()){
+                     sitioWeb=null;
+                 }
+                 if (email.trim().isEmpty()){
+                     email=null;
+                 }
 
 
                 //Se va a validar los campos con formatos REGEX
                 if (!Pattern.matches(RegexPatterns.NOMBRE_REGEX,nombreParroquia) ) {
                     mostrarAlerta("Error","Formato invalido en campo Nombre de la Parroquia.");
-                    txtFieldNombreParroquia.setText("");
+
                     return;
                 }
 
             if (!Pattern.matches(RegexPatterns.NOMBRE_REGEX,ciudad) ) {
                 mostrarAlerta("Error","Formato invalido en campo Ciudad.");
-                registroTextFieldCiudad.setText("");
+
                 return;
             }
         if (!Pattern.matches(RegexPatterns.DIRECCION_REGEX,direccion) ) {
             mostrarAlerta("Error","Formato invalido en campo Dirección.");
-            registrotextFieldDireccion.setText("");
+
             return;
         }
 
-            if (!Pattern.matches(RegexPatterns.NOMBRE_REGEX,parroco) ) {
-                mostrarAlerta("Error","Formato invalido en campo Nombre Parroco.");
-                registroTextFieldParroco.setText("");
-                return;
+
+        if (telefono !=null && !Pattern.matches(RegexPatterns.TELEFONO_REGEX,telefono) ) {
+            mostrarAlerta("Error","Formato invalido en campo Telefono. Deben ser 10 dígitos");
+            return;
+        }
+
+
+        if (sitioWeb != null && !Pattern.matches(RegexPatterns.WEB_REGEX,sitioWeb) ) {
+            mostrarAlerta("Error","Formato invalido en campo Sitio Web. Ej: www.iglesia.com");
+            return;
+        }
+
+
+
+            if (email != null && !Pattern.matches(RegexPatterns.EMAIL_REGEX,email) ) {
+                    mostrarAlerta("Error","Formato invalido en campo Email. Ej: arquidiocesis@gmail.com");
+                    return;
             }
 
 
-            if (!Pattern.matches(RegexPatterns.TELEFONO_REGEX,telefono) ) {
-                mostrarAlerta("Error","Formato invalido en campo Telefono. Deben ser 8 dígitos");
-                registroTxtFieldTelefono.setText("");
-                return;
-            }
-            if (!Pattern.matches(RegexPatterns.WEB_REGEX,sitioWeb) ) {
-                mostrarAlerta("Error","Formato invalido en campo Sitio Web. Ej: www.iglesia.com");
-                registroTxtFieldSitioWeb.setText("");
-                return;
-            }
-            if (!Pattern.matches(RegexPatterns.EMAIL_REGEX,email) ) {
-                mostrarAlerta("Error","Formato invalido en campo Email. Ej: arquidiocesis@gmail.com");
-                registroTxtFieldEmail.setText("");
-                return;
-            }
             if(!fechaFundacion.isBefore(fechaMaxima)||!fechaFundacion.isAfter(fechaMinima)){
                 mostrarAlerta("Error de Fecha","Solo puede elegir fechas desde 1800 hasta la fecha actual.");
                 return;
             }
-
-            Parroquia parroquia= new Parroquia(nombreParroquia,vicaria,ciudad,direccion,parroco,telefono,sitioWeb,email,fechaFundacion);
-        GuardarParroquiaSQL.guardarEnSQL(parroquia);
+            Parroquia parroquia= new Parroquia(nombreParroquia,vicaria,ciudad,direccion,fechaFundacion,parroco, telefono, email, sitioWeb);
+            GuardarParroquiaSQL.guardarEnSQL(parroquia);
     }
 
     @FXML
@@ -440,7 +439,7 @@ public class ArquidiocesisController {
         registroLabelDireccionParroquia.setVisible(false);
         registrotextFieldDireccion.setVisible(false);
         registroLabelParroco.setVisible(false);
-        registroTextFieldParroco.setVisible(false);
+        registroComboBoxParroco.setVisible(false);
         registroLabelTelefono.setVisible(false);
         registroTxtFieldTelefono.setVisible(false);
         registroLabelSitioWeb.setVisible(false);
@@ -477,7 +476,7 @@ public class ArquidiocesisController {
         registroLabelDireccionParroquia.setVisible(false);
         registrotextFieldDireccion.setVisible(false);
         registroLabelParroco.setVisible(false);
-        registroTextFieldParroco.setVisible(false);
+        registroComboBoxParroco.setVisible(false);
         registroLabelTelefono.setVisible(false);
         registroTxtFieldTelefono.setVisible(false);
         registroLabelSitioWeb.setVisible(false);
@@ -557,7 +556,7 @@ public class ArquidiocesisController {
         File archivoTemporal = fileChooser.showOpenDialog(stage);
 
         if (archivoTemporal != null) {
-            nombreArchivo = archivoTemporal.getName().toLowerCase();
+            String nombreArchivo = archivoTemporal.getName().toLowerCase();
 
             // 2. Verificamos si termina en .csv
             if (!nombreArchivo.endsWith(".csv")) {
