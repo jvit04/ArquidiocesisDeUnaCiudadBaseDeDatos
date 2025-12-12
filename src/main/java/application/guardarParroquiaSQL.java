@@ -8,10 +8,11 @@ import java.sql.*;
 
 public interface guardarParroquiaSQL {
 
-//interface para guardar en la base la parroquia
+    // Agregamos 'throws SQLException' para avisar que este método puede fallar
+    static void guardarEnSQL(Parroquia p) throws SQLException {
 
-    static void guardarEnSQL(Parroquia p) {
         String sql = "select insert_parroquia(?,?,?,?,?,?,?,?::DATE,?)";
+
 
         try (Connection connection = ConexionBD.conectar();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -27,14 +28,16 @@ public interface guardarParroquiaSQL {
             ps.setInt(9, p.getParroco());
 
             ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
                 String mensajeDeLaBase = rs.getString(1);
-               JOptionPane.showMessageDialog(null,mensajeDeLaBase);
-            }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Error al guardar en la Base de Datos: " + e.getMessage());
+                if (mensajeDeLaBase.startsWith("Error") || mensajeDeLaBase.contains("ya existe")) {
+                    throw new SQLException(mensajeDeLaBase);
+                }
+
+
+            }
         }
     }
 }

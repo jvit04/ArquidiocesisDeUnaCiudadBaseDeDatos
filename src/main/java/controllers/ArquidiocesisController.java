@@ -389,7 +389,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
 
 
         if (telefono !=null && !Pattern.matches(RegexPatterns.TELEFONO_REGEX,telefono) ) {
-            mostrarAlerta("Error","Formato invalido en campo Telefono. Deben ser 10 dígitos");
+            mostrarAlerta("Error","Formato invalido en campo Telefono. Deben ser 10 dígitos empezando en 09.Ej: 0912345678");
             return;
         }
 
