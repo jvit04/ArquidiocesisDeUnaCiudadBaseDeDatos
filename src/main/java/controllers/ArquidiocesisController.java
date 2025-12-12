@@ -346,7 +346,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         String sitioWeb = registroTxtFieldSitioWeb.getText();
         String email = registroTxtFieldEmail.getText();
         LocalDate fechaFundacion = registroDatePickerFF.getValue();
-        LocalDate fechaMinima = LocalDate.of(1800, 1, 1);
+        LocalDate fechaMinima = LocalDate.of(1500, 1, 1);
         LocalDate fechaMaxima = LocalDate.now();
 
 
