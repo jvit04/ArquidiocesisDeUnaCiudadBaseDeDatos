@@ -1,5 +1,8 @@
 package controllers;
+import application.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.sql.*;
 
 import application.*;
@@ -12,18 +15,24 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import utilities.ConexionBD;
+import utilities.Paths;
 import utilities.RegexPatterns;
 import javafx.scene.control.ChoiceBox;
-
+import java.sql.*;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class ArquidiocesisController implements cargarClerigos, guardarParroquiaSQL, cargarVicarias, importarParroquiasCSV  {
+public class ArquidiocesisController implements cargarClerigos, guardarParroquiaSQL , cargarVicarias {
     @FXML
     private AnchorPane ancorPane1;
 
@@ -189,9 +198,6 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         registroComboBoxParroco.getItems().addAll(cargarClerigos.cargarClerigos());
     }
 
-
-
-
     @FXML
     void mostrarMenu(ActionEvent event) {
         labelArquidiocesis2.setVisible(true);
@@ -214,14 +220,6 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
 
     @FXML
     void initialize(){
-        registroDatePickerFF.setDayCellFactory(param -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate date, boolean empty) {
-                super.updateItem(date, empty);
-                // Deshabilitar fechas futuras
-                setDisable(empty || date.compareTo(LocalDate.now()) > 0);
-            }
-        });
         setRegistroComboBoxParroco();
         labelArquidiocesis2.setVisible(false);
         labelArquidiocesis1.setVisible(true);
@@ -348,6 +346,8 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         String sitioWeb = registroTxtFieldSitioWeb.getText();
         String email = registroTxtFieldEmail.getText();
         LocalDate fechaFundacion = registroDatePickerFF.getValue();
+        LocalDate fechaMinima = LocalDate.of(1500, 1, 1);
+        LocalDate fechaMaxima = LocalDate.now();
 
 
                  if (nombreParroquia == null || nombreParroquia.trim().isEmpty()
@@ -406,33 +406,13 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
                     return;
             }
 
-        registroBotonEnviar.setDisable(true);
-        try {
-            Parroquia parroquia = new Parroquia(nombreParroquia, vicaria, ciudad, direccion, fechaFundacion, parroco, telefono, email, sitioWeb);
+
+            if(!fechaFundacion.isBefore(fechaMaxima)||!fechaFundacion.isAfter(fechaMinima)){
+                mostrarAlerta("Error de Fecha","Solo puede elegir fechas desde 1800 hasta la fecha actual.");
+                return;
+            }
+            Parroquia parroquia= new Parroquia(nombreParroquia,vicaria,ciudad,direccion,fechaFundacion,parroco, telefono, email, sitioWeb);
             guardarParroquiaSQL.guardarEnSQL(parroquia);
-            mostrarAlerta("Éxito", "La parroquia ha sido registrada correctamente.");
-            refrescarCrearParroquia();
-
-        } catch (Exception e) {
-            mostrarAlerta("Error al guardar", "No se pudo registrar: " + e.getMessage());
-
-        } finally {
-            registroBotonEnviar.setDisable(false);
-        }
-    }
-    void refrescarCrearParroquia(){
-        registroComboBoxParroco.getItems().clear();
-        setRegistroComboBoxParroco();
-        registroComboBoxParroco.getSelectionModel().selectFirst();
-        txtFieldNombreParroquia.setText("");
-        registroChoiceBoxVicaria.getSelectionModel().selectFirst();;
-        registroTextFieldCiudad.setText("");
-         registrotextFieldDireccion.setText("");
-       registroTxtFieldTelefono.setText("");
-        registroTxtFieldSitioWeb.setText("");
-       registroTxtFieldEmail.setText("");
-       registroDatePickerFF.setValue(null);
-
     }
 
     @FXML
@@ -610,7 +590,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
                     //importarFeligreses(archivoSeleccionado);
                     break;
                 case "parroquias":
-                    importarParroquiasCSV.importarParroquias(archivoSeleccionado);
+                    importarParroquias(archivoSeleccionado);
                     break;
                 case "sacerdotes":
                     //importarSacerdotes(archivoSeleccionado);
@@ -631,7 +611,66 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
             mostrarAlerta("Error de Base de Datos", "Falló la importación: " + e.getMessage());
         }
     }
+    //Metodos para cada entidad, ya que se debe validar que tabla se insertará :)
+    private void importarParroquias(File archivo) throws Exception {
+        String sql = "INSERT INTO parroquias (id_parroquia, nombre_parroquia, id_vicaria, direccion_parroquia, ciudad_parroquia, telefono_parroquia, email_parroquia, sitio_web_parroquia, fecha_ereccion_parroquia, id_parroco) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+        try (Connection connection = ConexionBD.conectar();
+             PreparedStatement pstmt = connection.prepareStatement(sql);
+             BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+
+            String linea;
+
+            while ((linea = br.readLine()) != null) {
+                String[] datos = linea.split(";");
+
+                if (datos.length == 10) {
+
+                    // 1. id_parroquia
+                    pstmt.setInt(1, Integer.parseInt(datos[0].trim().replace("\uFEFF", "")));
+
+                    // 2. nombre_parroquia
+                    pstmt.setString(2, datos[1].trim());
+
+                    // 3. id_vicaria
+                    pstmt.setInt(3, Integer.parseInt(datos[2].trim()));
+
+                    // 4. direccion_parroquia
+                    pstmt.setString(4, datos[3].trim());
+
+                    // 5. ciudad_parroquia
+                    pstmt.setString(5, datos[4].trim());
+
+                    // 6. telefono_parroquia
+                    pstmt.setString(6, datos[5].trim());
+
+                    // 7. email_parroquia
+                    pstmt.setString(7, datos[6].trim());
+
+                    // 8. sitio_web_parroquia
+                    pstmt.setString(8, datos[7].trim());
+
+                    // 9. fecha_ereccion_parroquia
+                    pstmt.setDate(9, Date.valueOf(datos[8].trim()));
+
+                    // 10. id_parroco
+                    String idParrocoStr = datos[9].trim();
+
+                    if (idParrocoStr.isEmpty() || idParrocoStr.equalsIgnoreCase("NULL")) {
+                        // java.sql.Types.INTEGER es necesario para indicar el tipo de dato nulo
+                        pstmt.setNull(10, java.sql.Types.INTEGER);
+                    } else {
+                        pstmt.setInt(10, Integer.parseInt(idParrocoStr));
+                    }
+
+                    pstmt.addBatch();
+                } else {
+                    System.err.println("Línea con formato incorrecto (se esperaban 10 campos, se encontraron " + datos.length + "): " + linea);
+                }
+            }
+            pstmt.executeBatch();
+        }
+    }
 
 
 
@@ -643,9 +682,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
-
-
-}
+    }
 
 
 
