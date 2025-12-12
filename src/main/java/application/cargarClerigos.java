@@ -6,8 +6,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+//interfaz que se encarga de cargar los clerigos almacenados en la base a través de una función
 public interface cargarClerigos {
-    default List<Clerigo> cargarClerigos(){
+    static List<Clerigo> cargarClerigos(){
         List<Clerigo> clerigos = new ArrayList<>();
 
 

@@ -3,13 +3,12 @@ package application;
 import utilities.ConexionBD;
 
 import javax.swing.*;
-import java.io.*;
 import java.sql.*;
 
 
-public interface GuardarParroquiaSQL {
+public interface guardarParroquiaSQL {
 
-
+//interface para guardar en la base la parroquia
 
     static void guardarEnSQL(Parroquia p) {
         String sql = "select registro_parroquias(?,?,?,?,?,?,?,?::DATE,?)";

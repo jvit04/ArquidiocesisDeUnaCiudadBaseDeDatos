@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface cargarVicarias {
-    default List<Vicaria> cargarVicarias(){
+    static List<Vicaria> cargarVicarias(){
         List<Vicaria> vicarias = new ArrayList<>();
 
 
