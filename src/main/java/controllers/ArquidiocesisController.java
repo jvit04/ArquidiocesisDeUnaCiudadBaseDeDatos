@@ -189,6 +189,9 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         registroComboBoxParroco.getItems().addAll(cargarClerigos.cargarClerigos());
     }
 
+
+
+
     @FXML
     void mostrarMenu(ActionEvent event) {
         labelArquidiocesis2.setVisible(true);
@@ -211,6 +214,14 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
 
     @FXML
     void initialize(){
+        registroDatePickerFF.setDayCellFactory(param -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                // Deshabilitar fechas futuras
+                setDisable(empty || date.compareTo(LocalDate.now()) > 0);
+            }
+        });
         setRegistroComboBoxParroco();
         labelArquidiocesis2.setVisible(false);
         labelArquidiocesis1.setVisible(true);
@@ -337,8 +348,6 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         String sitioWeb = registroTxtFieldSitioWeb.getText();
         String email = registroTxtFieldEmail.getText();
         LocalDate fechaFundacion = registroDatePickerFF.getValue();
-        LocalDate fechaMinima = LocalDate.of(1800, 1, 1);
-        LocalDate fechaMaxima = LocalDate.now();
 
 
                  if (nombreParroquia == null || nombreParroquia.trim().isEmpty()
@@ -397,13 +406,33 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
                     return;
             }
 
-
-            if(!fechaFundacion.isBefore(fechaMaxima)||!fechaFundacion.isAfter(fechaMinima)){
-                mostrarAlerta("Error de Fecha","Solo puede elegir fechas desde 1800 hasta la fecha actual.");
-                return;
-            }
-            Parroquia parroquia= new Parroquia(nombreParroquia,vicaria,ciudad,direccion,fechaFundacion,parroco, telefono, email, sitioWeb);
+        registroBotonEnviar.setDisable(true);
+        try {
+            Parroquia parroquia = new Parroquia(nombreParroquia, vicaria, ciudad, direccion, fechaFundacion, parroco, telefono, email, sitioWeb);
             guardarParroquiaSQL.guardarEnSQL(parroquia);
+            mostrarAlerta("Éxito", "La parroquia ha sido registrada correctamente.");
+            refrescarCrearParroquia();
+
+        } catch (Exception e) {
+            mostrarAlerta("Error al guardar", "No se pudo registrar: " + e.getMessage());
+
+        } finally {
+            registroBotonEnviar.setDisable(false);
+        }
+    }
+    void refrescarCrearParroquia(){
+        registroComboBoxParroco.getItems().clear();
+        setRegistroComboBoxParroco();
+        registroComboBoxParroco.getSelectionModel().selectFirst();
+        txtFieldNombreParroquia.setText("");
+        registroChoiceBoxVicaria.getSelectionModel().selectFirst();;
+        registroTextFieldCiudad.setText("");
+         registrotextFieldDireccion.setText("");
+       registroTxtFieldTelefono.setText("");
+        registroTxtFieldSitioWeb.setText("");
+       registroTxtFieldEmail.setText("");
+       registroDatePickerFF.setValue(null);
+
     }
 
     @FXML

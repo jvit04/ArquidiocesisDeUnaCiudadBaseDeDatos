@@ -11,7 +11,7 @@ public interface guardarParroquiaSQL {
 //interface para guardar en la base la parroquia
 
     static void guardarEnSQL(Parroquia p) {
-        String sql = "select registro_parroquias(?,?,?,?,?,?,?,?::DATE,?)";
+        String sql = "select insert_parroquia(?,?,?,?,?,?,?,?::DATE,?)";
 
         try (Connection connection = ConexionBD.conectar();
              PreparedStatement ps = connection.prepareStatement(sql)) {
