@@ -8,18 +8,18 @@ public class Parroquia {
     public String ciudad;
     public String direccion;
     public LocalDate fechaFundacion;
-    public int parroco;
+    public int clerigo;
     public String telefono;
     public String email;
     public String sitioWeb;
 
-    public Parroquia(String nombre, int vicaria, String ciudad, String direccion, LocalDate fechaFundacion, int parroco, String telefono, String email, String sitioWeb) {
+    public Parroquia(String nombre, int vicaria, String ciudad, String direccion, LocalDate fechaFundacion, int clerigo, String telefono, String email, String sitioWeb) {
         this.nombre = nombre;
         this.vicaria = vicaria;
         this.ciudad = ciudad;
         this.direccion = direccion;
         this.fechaFundacion = fechaFundacion;
-        this.parroco = parroco;
+        this.clerigo = clerigo;
         this.telefono = telefono;
         this.email = email;
         this.sitioWeb = sitioWeb;
@@ -57,12 +57,12 @@ public class Parroquia {
         this.direccion = direccion;
     }
 
-    public int getParroco() {
-        return parroco;
+    public int getClerigo() {
+        return clerigo;
     }
 
-    public void setParroco(int parroco) {
-        this.parroco = parroco;
+    public void setClerigo(int clerigo) {
+        this.clerigo = clerigo;
     }
 
     public String getTelefono() {

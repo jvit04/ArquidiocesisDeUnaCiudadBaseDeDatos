@@ -2,7 +2,6 @@ package application;
 
 import utilities.ConexionBD;
 
-import javax.swing.*;
 import java.sql.*;
 
 
@@ -25,7 +24,7 @@ public interface guardarParroquiaSQL {
             ps.setString(6, p.getEmail());
             ps.setString(7, p.getSitioWeb());
             ps.setDate(8, Date.valueOf(p.getFechaFundacion()));
-            ps.setInt(9, p.getParroco());
+            ps.setInt(9, p.getClerigo());
 
             ResultSet rs = ps.executeQuery();
 
