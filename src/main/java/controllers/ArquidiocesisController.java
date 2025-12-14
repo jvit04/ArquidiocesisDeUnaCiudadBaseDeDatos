@@ -145,7 +145,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
     private Label registroLabelVicaria;
 
     @FXML
-    private TextField registroTextFieldCiudad;
+    private ChoiceBox<String> registroChoiceBoxCiudad;
 
     @FXML
     private ComboBox<Clerigo> registroComboBoxParroco;
@@ -186,10 +186,14 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
 
 
     void setRegistroComboBoxParroco(){
+        registroComboBoxParroco.getItems().clear();
         registroComboBoxParroco.getItems().addAll(cargarClerigos.cargarClerigos());
     }
 
-
+void setRegistroChoiceBoxCiudad(){
+        registroChoiceBoxCiudad.getItems().clear();
+        registroChoiceBoxCiudad.getItems().addAll(cargarCiudades.cargarCiudades());
+}
 
 
     @FXML
@@ -253,7 +257,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         registroLabelVicaria.setVisible(false);
         registroChoiceBoxVicaria.setVisible(false);
         registroLabelCiudadPertenece.setVisible(false);
-        registroTextFieldCiudad.setVisible(false);
+        registroChoiceBoxCiudad.setVisible(false);
         registroLabelDireccionParroquia.setVisible(false);
         registrotextFieldDireccion.setVisible(false);
         registroLabelParroco.setVisible(false);
@@ -270,8 +274,9 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
 
         registroChoiceBoxVicaria.getItems().addAll(cargarVicarias.cargarVicarias());
         registroChoiceBoxVicaria.getSelectionModel().selectFirst();
+        registroChoiceBoxVicaria.getSelectionModel().selectedItemProperty().addListener((observable, valorAnterior, valorNuevo) -> {
+            configurarCiudadSegunVicaria(valorNuevo.toString());});
         txtFieldNombreParroquia.setText("");
-        registroTextFieldCiudad.setText("");
         registroComboBoxParroco.setValue(null);
         registrotextFieldDireccion.setText("");
         registroTxtFieldTelefono.setText("");
@@ -297,7 +302,35 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
             e.printStackTrace(); // Imprime el error si falla la conexión
         }
     }
+    private void configurarCiudadSegunVicaria(String vicariaSeleccionada) {
+        if (vicariaSeleccionada == null) return;
 
+        switch (vicariaSeleccionada) {
+            case "Vicaría Daule-Samborondón":
+                // el choice box solo se activa con la vicaria Daule-Samborondón
+                registroChoiceBoxCiudad.setDisable(false);
+                registroChoiceBoxCiudad.setItems(FXCollections.observableArrayList("Daule", "Samborondón"));
+                registroChoiceBoxCiudad.setValue(null);
+                break;
+
+            case "Vicaría Durán":
+                bloquearYAsignarCiudad("Durán");
+                break;
+            case "Vicaría Santa Elena":
+                bloquearYAsignarCiudad("Playas");
+                break;
+            default:
+                // todas las demás pertenecen a Guayaquil
+                bloquearYAsignarCiudad("Guayaquil");
+                break;
+        }
+    }
+
+    private void bloquearYAsignarCiudad(String nombreCiudad) {
+        registroChoiceBoxCiudad.setItems(FXCollections.observableArrayList(nombreCiudad)); // La lista solo tiene 1 opción
+        registroChoiceBoxCiudad.setValue(nombreCiudad); // La seleccionamos automáticamente
+        registroChoiceBoxCiudad.setDisable(true); // Bloqueamos el control para que no lo cambien
+    }
     @FXML
     void crearParroquia(ActionEvent event) {
         registroComboBoxParroco.getSelectionModel().selectFirst();
@@ -320,7 +353,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         registroLabelVicaria.setVisible(true);
         registroChoiceBoxVicaria.setVisible(true);
         registroLabelCiudadPertenece.setVisible(true);
-        registroTextFieldCiudad.setVisible(true);
+        registroChoiceBoxCiudad.setVisible(true);
         registroLabelDireccionParroquia.setVisible(true);
         registrotextFieldDireccion.setVisible(true);
         registroLabelParroco.setVisible(true);
@@ -341,7 +374,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
      //Validación de campos
         String nombreParroquia = txtFieldNombreParroquia.getText();
         int vicaria = registroChoiceBoxVicaria.getValue().getIdVicaria();
-        String ciudad = registroTextFieldCiudad.getText();
+        String ciudad = registroChoiceBoxCiudad.getValue();
         String direccion = registrotextFieldDireccion.getText();
         int parroco = registroComboBoxParroco.getValue().getId_clerigo();
         String telefono = registroTxtFieldTelefono.getText();
@@ -421,12 +454,11 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         }
     }
     void refrescarCrearParroquia(){
-        registroComboBoxParroco.getItems().clear();
         setRegistroComboBoxParroco();
         registroComboBoxParroco.getSelectionModel().selectFirst();
         txtFieldNombreParroquia.setText("");
         registroChoiceBoxVicaria.getSelectionModel().selectFirst();;
-        registroTextFieldCiudad.setText("");
+        registroChoiceBoxCiudad.setValue(null);
          registrotextFieldDireccion.setText("");
        registroTxtFieldTelefono.setText("");
         registroTxtFieldSitioWeb.setText("");
@@ -456,7 +488,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         registroLabelVicaria.setVisible(false);
         registroChoiceBoxVicaria.setVisible(false);
         registroLabelCiudadPertenece.setVisible(false);
-        registroTextFieldCiudad.setVisible(false);
+        registroChoiceBoxCiudad.setVisible(false);
         registroLabelDireccionParroquia.setVisible(false);
         registrotextFieldDireccion.setVisible(false);
         registroLabelParroco.setVisible(false);
@@ -493,7 +525,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         registroLabelVicaria.setVisible(false);
         registroChoiceBoxVicaria.setVisible(false);
         registroLabelCiudadPertenece.setVisible(false);
-        registroTextFieldCiudad.setVisible(false);
+        registroChoiceBoxCiudad.setVisible(false);
         registroLabelDireccionParroquia.setVisible(false);
         registrotextFieldDireccion.setVisible(false);
         registroLabelParroco.setVisible(false);
