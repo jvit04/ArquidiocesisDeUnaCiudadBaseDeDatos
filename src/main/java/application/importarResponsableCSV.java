@@ -12,8 +12,8 @@ import java.sql.Types;
 
 public interface importarResponsableCSV {
 
-    static void importarParroquias(File archivo) throws Exception {
-        String sql = "SELECT insert_parroquia(?, ?)";
+    static void importarResponsable(File archivo) throws Exception {
+        String sql = "SELECT insert_responsable(?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
              PreparedStatement pstmt = connection.prepareStatement(sql);

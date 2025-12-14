@@ -11,7 +11,7 @@ import java.sql.Types;
 
 public interface importarReceptorSacramentoCSV {
 
-    static void importarParroquias(File archivo) throws Exception {
+    static void importarReceptorSacramento(File archivo) throws Exception {
         String sql = "SELECT insert_receptor_sacramento(?, ?)";
 
         try (Connection connection = ConexionBD.conectar();

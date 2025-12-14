@@ -14,8 +14,8 @@ import java.time.format.DateTimeFormatter;
 
 public interface importarActividadesCSV {
 
-    static void importarParroquias(File archivo) throws Exception {
-        String sql = "SELECT insert_parroquia(?, ?, ?::DATE, ?, ?)";
+    static void importarActividades(File archivo) throws Exception {
+        String sql = "SELECT insert_actividades(?, ?, ?::DATE, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
              PreparedStatement pstmt = connection.prepareStatement(sql);

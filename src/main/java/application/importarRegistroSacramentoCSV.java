@@ -12,7 +12,7 @@ import java.sql.Types;
 
 public interface importarRegistroSacramentoCSV {
 
-    static void importarParroquias(File archivo) throws Exception {
+    static void importarRegistroSacramento(File archivo) throws Exception {
         String sql = "SELECT insert_registro_sacramento(?, ?::DATE, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
