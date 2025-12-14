@@ -143,7 +143,6 @@
             <Font name="Marcellus" size="12.0" />
          </font>
       </Label>
-      <TextField fx:id="registroTextFieldCiudad" layoutX="175.0" layoutY="231.0" visible="false" />
       <Label fx:id="registroLabelDireccionParroquia" layoutX="178.0" layoutY="266.0" text="Dirección de la Parroquia" visible="false">
          <font>
             <Font name="Marcellus" size="12.0" />
@@ -187,5 +186,6 @@
       </Label>
       <ChoiceBox fx:id="registroChoiceBoxVicaria" layoutX="174.0" layoutY="172.0" prefWidth="150.0" visible="false" />
       <ComboBox fx:id="registroComboBoxParroco" layoutX="175.0" layoutY="344.0" prefWidth="150.0" visible="false" />
+      <ChoiceBox fx:id="registroChoiceBoxCiudad" layoutX="175.0" layoutY="231.0" prefWidth="150.0" />
    </children>
 </AnchorPane>
