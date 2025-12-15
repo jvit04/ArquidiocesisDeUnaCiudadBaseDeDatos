@@ -618,24 +618,62 @@ void setRegistroChoiceBoxCiudad(){
         String nombreArchivo = archivoSeleccionado.getName().toLowerCase().replace(".csv", "");
 
         try {
-            switch (nombreArchivo) {
+            switch (nombreArchivo.toLowerCase()) {
+
                 case "actividades":
                     importarActividadesCSV.importarActividades(archivoSeleccionado);
                     break;
-                case "parroquias":
+                case "parroquia":
                     importarParroquiasCSV.importarParroquias(archivoSeleccionado);
                     break;
-                case "sacerdotes":
-                    //importarSacerdotes(archivoSeleccionado);
+                case "clerigo":
+                    importarClerigoCSV.importarClerigo(archivoSeleccionado);
                     break;
+
+                case "convenio":
+                    importarConvenioCSV.importarConvenio(archivoSeleccionado);
+                    break;
+
+                case "evento":
+                    importarEventosCSV.importarEventos(archivoSeleccionado);
+                    break;
+
+                case "lugares_culto":
+                    importarLugaresCultoCSV.importarLugaresCulto(archivoSeleccionado);
+                    break;
+
+                case "pastorales":
+                    importarPastoralesCSV.importarPastorales(archivoSeleccionado);
+                    break;
+
+                case "proyectos_pastorales":
+                    importarProyectosPastoralesCSV.importarProyectosPastorales(archivoSeleccionado);
+                    break;
+
+                case "receptor_sacramento":
+                    importarReceptorSacramentoCSV.importarReceptorSacramento(archivoSeleccionado);
+                    break;
+
+                case "registro_sacramento":
+                    importarRegistroSacramentoCSV.importarRegistroSacramento(archivoSeleccionado);
+                    break;
+
+                case "responsable":
+                    importarResponsableCSV.importarResponsable(archivoSeleccionado);
+                    break;
+
+                case "vicaria":
+                    importarVicariasCSV.importarVicarias(archivoSeleccionado);
+                    break;
+
                 default:
                     mostrarAlerta("Archivo Desconocido",
-                            "El nombre del archivo (" + nombreArchivo + ") no coincide con ninguna tabla registrada.");
+                            "El archivo '" + nombreArchivo + "' no corresponde a ninguna tabla configurada.");
                     return;
             }
 
 
-            mostrarAlerta("Éxito", "Los datos de " + nombreArchivo + " se importaron correctamente.");
+            mostrarAlerta("Éxito", "Importación de " + nombreArchivo + " completada correctamente.");
             textFieldRutaArchivo.clear();
             archivoSeleccionado = null;
 

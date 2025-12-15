@@ -19,69 +19,71 @@ public interface importarVicariasCSV {
              BufferedReader br = new BufferedReader(new FileReader(archivo))) {
 
             String linea;
-            int numeroLinea = 0; // Para saber en qué línea falló
+            int numeroLinea = 0;
 
             while ((linea = br.readLine()) != null) {
                 numeroLinea++;
                 String[] datos = linea.split(";", -1);
 
-                // Verificamos que tenga las 4 columnas
                 if (datos.length >= 4) {
 
-                    // --- VALIDACIÓN DE CAMPO OBLIGATORIO: NOMBRE_VICARIA (Índice 0) ---
-                    String nombreVicaria = datos[0].trim();
-                    if (nombreVicaria.isEmpty()) {
-                        System.err.println("Error en línea " + numeroLinea + ": El nombre está vacío y es obligatorio. Se omite el registro.");
-                        continue; // Saltamos al siguiente ciclo while (siguiente línea del CSV)
+                    // -- 1. Nombre (Obligatorio) --
+                    String nombre = datos[0].trim().replace("\uFEFF", "");
+                    if (nombre.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Nombre de Vicaria vacío. Registro omitido.");
+                        continue;
                     }
 
-                    // --- VALIDACIÓN DE CAMPO OBLIGATORIO: Descripcion (Índice 1) ---
-                    String DescVicaria = datos[1].trim();
-                    if (DescVicaria.isEmpty()) {
-                        System.err.println("Error en línea " + numeroLinea + ": La descripcion está vacía. Se omite el registro.");
+                    // -- 2. Descripción (OPCIONAL/NULLABLE) --
+                    String descripcion = datos[1].trim();
+
+                    // -- 3. Email (Obligatorio) --
+                    String email = datos[2].trim();
+                    if (email.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Email vacío. Registro omitido.");
+                        continue;
+                    }
+
+                    // -- 4. Teléfono (Obligatorio) --
+                    String telefono = datos[3].trim();
+                    if (telefono.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Teléfono vacío. Registro omitido.");
                         continue;
                     }
 
                     try {
-                        // 1. Nombre Vicaria
-                        pstmt.setString(1, datos[0].trim().replace("\uFEFF", ""));
+                        // Asignación de parámetros
 
-                        // 2. Descripcion Vicaria
-                        pstmt.setString(2, datos[1].trim().replace("\uFEFF", ""));
+                        // 1. p_nombre
+                        pstmt.setString(1, nombre);
 
-                        // --- OPCIONALES (Manejo de NULL) ---
-
-                        // 3. Email
-                        String email = datos[2].trim();
-                        if (email.isEmpty() || email.equalsIgnoreCase("NULL")) {
-                            pstmt.setNull(3, Types.VARCHAR);
+                        // 2. p_descripcion (Único NULLABLE)
+                        if (descripcion.isEmpty() || descripcion.equalsIgnoreCase("NULL")) {
+                            pstmt.setNull(2, Types.VARCHAR); // Usamos VARCHAR o CLOB según corresponda a 'text'
                         } else {
-                            pstmt.setString(3, email);
+                            pstmt.setString(2, descripcion);
                         }
 
-                        // 4. Telefono
-                        String telefono = datos[3].trim();
-                        if (telefono.isEmpty() || telefono.equalsIgnoreCase("NULL")) {
-                            pstmt.setNull(4, Types.VARCHAR);
-                        } else {
-                            pstmt.setString(4, telefono);
-                        }
+                        // 3. p_email
+                        pstmt.setString(3, email);
+
+                        // 4. p_telefono
+                        pstmt.setString(4, telefono);
 
                         // Añadir al lote
                         pstmt.addBatch();
 
-                    } catch (NumberFormatException e) {
-                        System.err.println("Error de formato numérico en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (Exception e) {
+                        System.err.println("Error inesperado en línea " + numeroLinea + ": " + e.getMessage());
                     }
 
-
                 } else {
-                    System.err.println("Línea " + numeroLinea + " omitida: Formato incorrecto (columnas insuficientes).");
+                    System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 4).");
                 }
             }
             // Ejecutar inserción masiva
             pstmt.executeBatch();
-            System.out.println("Proceso finalizado.");
+            System.out.println("Proceso de importación de Vicarías finalizado.");
         }
     }
 }

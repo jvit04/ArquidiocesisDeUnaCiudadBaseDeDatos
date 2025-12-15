@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.Types;
 
 public interface importarReceptorSacramentoCSV {
 
@@ -19,38 +18,49 @@ public interface importarReceptorSacramentoCSV {
              BufferedReader br = new BufferedReader(new FileReader(archivo))) {
 
             String linea;
-            int numeroLinea = 0; // Para saber en qué línea falló
+            int numeroLinea = 0;
 
             while ((linea = br.readLine()) != null) {
                 numeroLinea++;
                 String[] datos = linea.split(";", -1);
 
-                // Verificamos que tenga las 2 columnas
                 if (datos.length >= 2) {
 
-                    // --- VALIDACIÓN DE CAMPO OBLIGATORIO: CEDULA_REGISTRO_SACRAMENTO (Índice 1) ---
-                    String idRegisSacra = datos[1].trim();
-                    if (idRegisSacra.isEmpty()) {
-                        System.err.println("Error en línea " + numeroLinea + ": El ID_REGISTRO_SACRAMENTO está vacío y es obligatorio. Se omite el registro.");
-                        continue; // Saltamos al siguiente ciclo while (siguiente línea del CSV)
+                    // -- 1. Cédula (Obligatorio - Varchar) --
+                    String cedula = datos[0].trim().replace("\uFEFF", "");
+                    if (cedula.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": La cédula está vacía. Registro omitido.");
+                        continue;
                     }
 
-                    // 1. Cedula Receptor Sacramento
-                    pstmt.setString(1, datos[0].trim().replace("\uFEFF", ""));
+                    // -- 2. ID Registro Sacramento (Obligatorio - Integer) --
+                    String idRegistroStr = datos[1].trim();
+                    if (idRegistroStr.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": El ID Registro Sacramento está vacío. Registro omitido.");
+                        continue;
+                    }
 
-                    // 2. ID Registro Sacramento
-                    pstmt.setInt(2, Integer.parseInt(idRegisSacra));
+                    try {
+                        // 1. p_cedula
+                        pstmt.setString(1, cedula);
 
-                    // Añadir al lote
-                    pstmt.addBatch();
+                        // 2. p_id_registro_sacramento
+                        pstmt.setInt(2, Integer.parseInt(idRegistroStr));
+
+                        // Añadir al lote
+                        pstmt.addBatch();
+
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error de formato numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
+                    }
 
                 } else {
-                    System.err.println("Línea " + numeroLinea + " omitida: Formato incorrecto (columnas insuficientes).");
+                    System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 2).");
                 }
             }
             // Ejecutar inserción masiva
             pstmt.executeBatch();
-            System.out.println("Proceso finalizado.");
+            System.out.println("Proceso de importación de Receptor Sacramento finalizado.");
         }
     }
 }
