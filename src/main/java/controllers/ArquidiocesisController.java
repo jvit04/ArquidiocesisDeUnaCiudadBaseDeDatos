@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -51,26 +52,10 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
     @FXML
     private Button botonSubir;
 
-    @FXML
-    private TableColumn<Parroquia, String> ciudad;
-
-    @FXML
-    private TableColumn<Parroquia, String> direccion;
-
-    @FXML
-    private TableColumn<Parroquia, String> email;
-
-    @FXML
-    private TableColumn<Parroquia, String> fecha_ereccion;
 
     @FXML
     private ImageView gifCatedral;
 
-    @FXML
-    private TableColumn<Parroquia, Integer> idParroquia;
-
-    @FXML
-    private TableColumn<Parroquia, Integer> id_vicaria;
 
     @FXML
     private ImageView imageCatedral;
@@ -93,8 +78,6 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
     @FXML
     private VBox menuBotones;
 
-    @FXML
-    private TableColumn<Parroquia, String> nombre_parroquia;
 
     @FXML
     private Rectangle rectanguloFondo;
@@ -166,13 +149,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
     private TextField registrotextFieldDireccion;
 
     @FXML
-    private TableColumn<Parroquia, String> sitio_web;
-
-    @FXML
-    private TableView<Parroquia> tablaReporte;
-
-    @FXML
-    private TableColumn<Parroquia, String> telefono;
+    private TableView<VistaReporte> tablaReporte;
 
     @FXML
     private TextField textFieldRutaArchivo;
@@ -180,6 +157,23 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
     @FXML
     private TextField txtFieldNombreParroquia;
 
+    @FXML
+    private TableColumn<VistaReporte, Integer> planificados;
+
+    @FXML
+    private TableColumn<VistaReporte, String> presupuestoTotal;
+
+    @FXML
+    private TableColumn<VistaReporte, Integer> proyectosTotales;
+    @FXML
+    private TableColumn<VistaReporte, String> vicariaResponsable;
+    @FXML
+    private TableColumn<VistaReporte, String> inversionPromedio;
+    @FXML
+    private TableColumn<VistaReporte, Integer> canceladosSuspendidos;
+
+    @FXML
+    private TableColumn<VistaReporte, Integer> enEjecucion;
 
 
     private File archivoSeleccionado;
@@ -284,17 +278,22 @@ void setRegistroChoiceBoxCiudad(){
         registroTxtFieldEmail.setText("");
         registroDatePickerFF.setValue(null);
 
-//
-//        idParroquia.setCellValueFactory(new PropertyValueFactory<>("idParroquia"));
-//        nombre_parroquia.setCellValueFactory(new PropertyValueFactory<>("nombreParroquia"));
-//        direccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
-//        ciudad.setCellValueFactory(new PropertyValueFactory<>("ciudad"));
-//        telefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
-//        email.setCellValueFactory(new PropertyValueFactory<>("email"));
-//        sitio_web.setCellValueFactory(new PropertyValueFactory<>("sitioWeb"));
-//        fecha_ereccion.setCellValueFactory(new PropertyValueFactory<>("fechaEreccion"));
-//        id_vicaria.setCellValueFactory(new PropertyValueFactory<>("idVicaria"));
 
+
+        vicariaResponsable.setCellValueFactory(new PropertyValueFactory<>("vicariaResponsable"));
+        proyectosTotales.setCellValueFactory(new PropertyValueFactory<>("proyectosTotales"));
+        enEjecucion.setCellValueFactory(new PropertyValueFactory<>("enEjecucion"));
+        planificados.setCellValueFactory(new PropertyValueFactory<>("planificados"));
+        canceladosSuspendidos.setCellValueFactory(new PropertyValueFactory<>("canceladosSuspendidos"));
+        presupuestoTotal.setCellValueFactory(new PropertyValueFactory<>("presupuestoTotal"));
+        inversionPromedio.setCellValueFactory(new PropertyValueFactory<>("inversionPromedio"));
+        proyectosTotales.setStyle("-fx-alignment: CENTER;");
+        enEjecucion.setStyle("-fx-alignment: CENTER;");
+        planificados.setStyle("-fx-alignment: CENTER;");
+        canceladosSuspendidos.setStyle("-fx-alignment: CENTER;");
+        presupuestoTotal.setStyle("-fx-alignment: CENTER-RIGHT;");
+        inversionPromedio.setStyle("-fx-alignment: CENTER-RIGHT;");
+        vicariaResponsable.setStyle("-fx-alignment: CENTER-LEFT;");
 
         try {
             cargarTabla();
@@ -327,9 +326,9 @@ void setRegistroChoiceBoxCiudad(){
     }
 
     private void bloquearYAsignarCiudad(String nombreCiudad) {
-        registroChoiceBoxCiudad.setItems(FXCollections.observableArrayList(nombreCiudad)); // La lista solo tiene 1 opción
-        registroChoiceBoxCiudad.setValue(nombreCiudad); // La seleccionamos automáticamente
-        registroChoiceBoxCiudad.setDisable(true); // Bloqueamos el control para que no lo cambien
+        registroChoiceBoxCiudad.setItems(FXCollections.observableArrayList(nombreCiudad));
+        registroChoiceBoxCiudad.setValue(nombreCiudad); // se selecciona una ciudad automaticamente
+        registroChoiceBoxCiudad.setDisable(true);
     }
     @FXML
     void crearParroquia(ActionEvent event) {
@@ -347,6 +346,9 @@ void setRegistroChoiceBoxCiudad(){
         //Objetos de Registro
         labelArquidiocesis2.setVisible(false);
         labelArquidiocesis3.setVisible(true);
+        registroLabelDescripcion.setLayoutY(63);
+        registroLabelDescripcion.setLayoutX(263);
+        registroLabelDescripcion.setText("Registrar parroquia en la Arquidiócesis");
         registroLabelDescripcion.setVisible(true);
         registroLabelNombreParroquia.setVisible(true);
         txtFieldNombreParroquia.setVisible(true);
@@ -467,7 +469,7 @@ void setRegistroChoiceBoxCiudad(){
     }
 
     @FXML
-    void generarReporte(ActionEvent event) {
+    void generarReporte(ActionEvent event) throws SQLException {
         labelSeleccione.setVisible(false);
         labelArquidiocesis2.setLayoutY(24);
         labelDinamico.setVisible(false);
@@ -481,7 +483,10 @@ void setRegistroChoiceBoxCiudad(){
         //Objetos de Registro
         labelArquidiocesis2.setVisible(true);
         labelArquidiocesis3.setVisible(false);
-        registroLabelDescripcion.setVisible(false);
+        registroLabelDescripcion.setLayoutY(75);
+        registroLabelDescripcion.setLayoutX(207);
+        registroLabelDescripcion.setText("Pulse el botón descargar para obtener los reportes completos");
+        registroLabelDescripcion.setVisible(true);
         registroLabelNombreParroquia.setVisible(false);
         txtFieldNombreParroquia.setVisible(false);
         registroLabelVicaria.setVisible(false);
@@ -501,6 +506,8 @@ void setRegistroChoiceBoxCiudad(){
         registroLabelFechaF.setVisible(false);
         registroDatePickerFF.setVisible(false);
         registroBotonEnviar.setVisible(false);
+        cargarTabla();
+
 
     }
     @FXML
@@ -567,37 +574,12 @@ void setRegistroChoiceBoxCiudad(){
     }
 
     private void cargarTabla() throws SQLException{
-            // lista observable donde se guardan los datos
-            ObservableList<Parroquia> listaParroquias = FXCollections.observableArrayList();
-
-
-//
-//            try (Connection connection = ConexionBD.conectar();
-//                    Statement stmt = connection.createStatement();
-//                 ResultSet resultSet = stmt.executeQuery("SELECT * FROM parroquias")) {
-//
-//                while (resultSet.next()) {
-//                    Parroquia p = new Parroquia(
-//                            resultSet.getInt("idParroquia"),
-//                            resultSet.getString("nombre_parroquia"),
-//                            resultSet.getString("direccion_parroquia"),
-//                            resultSet.getString("ciudad_parroquia"),
-//                            resultSet.getString("telefono_parroquia"),
-//                            resultSet.getString("email_parroquia"),
-//                            resultSet.getString("sitio_web"),
-//                            resultSet.getDate("fecha_ereccion"),
-//                            resultSet.getInt("id_vicaria")
-//                    );
-//
-//                    listaParroquias.add(p);
-//                }
-//            } catch (SQLException e) {
-//                throw e; //Excepción para verla en consola
-//            }
-//
-//            // 4. Asignar la lista llena a la Tabla
-//            tablaReporte.setItems(listaParroquias);
+            // lista observable donde se reciben los datos
+            ObservableList<VistaReporte> vistaReporteObservableList;
+            vistaReporteObservableList = cargarVistaReporte.cargarReporte();
+            tablaReporte.setItems(vistaReporteObservableList);
         }
+
         private File archivoTemporal;
     @FXML
     void examinarRuta(ActionEvent event) {
@@ -637,8 +619,8 @@ void setRegistroChoiceBoxCiudad(){
 
         try {
             switch (nombreArchivo) {
-                case "parroqua":
-                    //importarFeligreses(archivoSeleccionado);
+                case "actividades":
+                    importarActividadesCSV.importarActividades(archivoSeleccionado);
                     break;
                 case "parroquias":
                     importarParroquiasCSV.importarParroquias(archivoSeleccionado);

@@ -107,19 +107,17 @@
       </ImageView>
       <TableView fx:id="tablaReporte" layoutX="173.0" layoutY="105.0" prefHeight="200.0" prefWidth="395.0" stylesheets="@tablaDisegno.css">
         <columns>
-          <TableColumn fx:id="idParroquia" prefWidth="75.0" text="idParroquia" />
-          <TableColumn fx:id="nombre_parroquia" prefWidth="75.0" text="nombre_parroquia" />
-            <TableColumn fx:id="id_vicaria" prefWidth="75.0" text="id_vicaria" />
-            <TableColumn fx:id="direccion" prefWidth="75.0" text="direccion" />
-            <TableColumn fx:id="ciudad" prefWidth="75.0" text="ciudad" />
-            <TableColumn fx:id="telefono" prefWidth="75.0" text="telefono" />
-            <TableColumn fx:id="email" editable="false" prefWidth="75.0" text="email" />
-            <TableColumn fx:id="sitio_web" prefWidth="75.0" text="sitio_web" />
-            <TableColumn fx:id="fecha_ereccion" prefWidth="75.0" text="fecha_ereccion" />
+          <TableColumn fx:id="vicariaResponsable" editable="false" prefWidth="150.0" resizable="false" sortable="false" text="Vicaria Responsable" />
+          <TableColumn fx:id="proyectosTotales" editable="false" prefWidth="150.0" resizable="false" sortable="false" text="Proyectos Totales" />
+            <TableColumn fx:id="enEjecucion" editable="false" prefWidth="150.0" resizable="false" sortable="false" text="En Ejecución" />
+            <TableColumn fx:id="planificados" editable="false" prefWidth="150.0" resizable="false" sortable="false" text="Planificados" />
+            <TableColumn fx:id="canceladosSuspendidos" editable="false" prefWidth="150.0" resizable="false" sortable="false" text="Cancelados/Suspendidos" />
+            <TableColumn fx:id="presupuestoTotal" editable="false" prefWidth="150.0" resizable="false" sortable="false" text="Presupuesto Total" />
+            <TableColumn fx:id="inversionPromedio" editable="false" prefWidth="150.0" resizable="false" sortable="false" text="Inversión Promedio" />
         </columns>
-         <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-         </columnResizePolicy>
+         <cursor>
+            <Cursor fx:constant="DEFAULT" />
+         </cursor>
       </TableView>
       <Button fx:id="botonDescargar" layoutX="316.0" layoutY="324.0" mnemonicParsing="false" prefWidth="193.0" styleClass="boton-elegante" stylesheets="@botonesSueltosArquidiocesis.css" text="Descargar" visible="false" />
       <Label fx:id="registroLabelDescripcion" layoutX="263.0" layoutY="63.0" text="Registrar parroquia en la Arquidiócesis ">
@@ -179,13 +177,13 @@
          </font>
       </Label>
       <DatePicker fx:id="registroDatePickerFF" layoutX="400.0" layoutY="286.0" prefHeight="26.0" prefWidth="152.0" visible="false" />
-      <Label fx:id="labelArquidiocesis3" layoutX="274.0" layoutY="24.0" text="Arquidiócesis" textAlignment="CENTER" textFill="#2f3e28">
+      <Label fx:id="labelArquidiocesis3" layoutX="280.0" layoutY="24.0" text="Arquidiócesis" textAlignment="CENTER" textFill="#2f3e28">
          <font>
             <Font name="Cinzel Regular" size="25.0" />
          </font>
       </Label>
       <ChoiceBox fx:id="registroChoiceBoxVicaria" layoutX="174.0" layoutY="172.0" prefWidth="150.0" visible="false" />
       <ComboBox fx:id="registroComboBoxParroco" layoutX="175.0" layoutY="344.0" prefWidth="150.0" visible="false" />
-      <ChoiceBox fx:id="registroChoiceBoxCiudad" layoutX="175.0" layoutY="231.0" prefWidth="150.0" />
+      <ChoiceBox fx:id="registroChoiceBoxCiudad" disable="true" layoutX="175.0" layoutY="231.0" prefWidth="150.0" visible="false" />
    </children>
 </AnchorPane>

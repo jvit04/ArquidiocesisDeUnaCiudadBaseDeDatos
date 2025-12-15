@@ -3,49 +3,51 @@
     -fx-base: #F5F0E6; /* Fondo crema claro */
     -fx-control-inner-background: #F5F0E6;
     -fx-background-color: #F5F0E6;
-    -fx-table-cell-border-color: transparent; /* Quita líneas verticales feas */
+    -fx-table-cell-border-color: transparent;
     -fx-table-header-border-color: transparent;
     -fx-padding: 5;
+
 }
 
-/* 2. Encabezado de las columnas (Donde dice "Nombre", "Cargo") */
+
 .table-view .column-header-background {
-    -fx-background-color: #2F3E28; /* Tu Verde Oscuro Institucional */
-    -fx-background-radius: 5px 5px 0 0; /* Bordes redondeados arriba */
+    -fx-background-color: #2F3E28;
+    -fx-background-radius: 5px 5px 0 0;
 }
 
 .table-view .column-header, .table-view .filler {
     -fx-background-color: transparent;
-    -fx-size: 35px; /* Altura del encabezado */
+    -fx-size: 35px;
     -fx-border-color: transparent;
+
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: #F5F0E6; /* Texto Dorado */
+    -fx-text-fill: #F5F0E6;
     -fx-font-weight: bold;
-    -fx-alignment: CENTER_LEFT;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: center;
 }
 
-/* 3. Las filas (Celdas) */
+
 .table-row-cell {
-    -fx-background-color: #F5F0E6; /* Fondo crema para las filas */
+    -fx-background-color: #F5F0E6;
     -fx-border-color: transparent;
 }
 
-/* 4. Filas impares (para efecto cebra, opcional pero elegante) */
+
 .table-row-cell:odd {
-    -fx-background-color: #EFEBD8; /* Un crema un poquito más oscuro */
+    -fx-background-color: #EFEBD8;
 }
 
-/* 5. Cuando seleccionas una fila (Hover y Selection) */
+
 .table-row-cell:filled:hover {
-    -fx-background-color: #D3D9C9; /* Verde muy pálido al pasar el mouse */
+    -fx-background-color: #D3D9C9;
 }
-
 .table-row-cell:filled:selected {
-    -fx-background-color: #8D9B6A; /* Tu Verde Oliva Medio al seleccionar */
+    -fx-background-color: #8D9B6A;
 }
 
 .table-row-cell:filled:selected .text {
-    -fx-fill: white; /* Texto blanco cuando se selecciona para contraste */
+    -fx-fill: white;
 }
