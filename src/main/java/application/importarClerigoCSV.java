@@ -1,18 +1,16 @@
 package application;
 
 import utilities.ConexionBD;
+import utilities.ExcepcionAmigable;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Types;
+import java.sql.*;
 
-public interface importarClerigoCSV {
+public class importarClerigoCSV implements ExcepcionAmigable {
 
-    static void importarClerigo(File archivo) throws Exception {
+  public  static void importarClerigo(File archivo) throws Exception {
         String sql = "SELECT insert_clerigo(?, ?, ?, ?, ?::DATE, ?::DATE, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
@@ -110,9 +108,12 @@ public interface importarClerigoCSV {
                         // Añadir al lote
                         pstmt.addBatch();
 
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
                     } catch (IllegalArgumentException e) {
                         System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         System.err.println("Error inesperado en línea " + numeroLinea + ": " + e.getMessage());
                     }
 
@@ -120,8 +121,12 @@ public interface importarClerigoCSV {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 8).");
                 }
             }
-            // Ejecutar inserción masiva
-            pstmt.executeBatch();
+            try{
+                pstmt.executeBatch();
+            }
+            catch (SQLException e) {
+                ExcepcionAmigable.verificarErrorAmigable(e);
+            }
             System.out.println("Proceso de importación de Clérigos finalizado.");
         }
     }

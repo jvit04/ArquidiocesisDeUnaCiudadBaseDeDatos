@@ -1,16 +1,18 @@
 package application;
 
 import utilities.ConexionBD;
+import utilities.ExcepcionAmigable;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-public interface importarResponsableCSV {
+public class importarResponsableCSV implements ExcepcionAmigable {
 
-    static void importarResponsable(File archivo) throws Exception {
+    public static void importarResponsable(File archivo) throws Exception {
         String sql = "SELECT insert_responsable(?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
@@ -52,15 +54,22 @@ public interface importarResponsableCSV {
                         pstmt.addBatch();
 
                     } catch (NumberFormatException e) {
-                        System.err.println("Error de formato numérico (IDs) en línea " + numeroLinea + ": " + e.getMessage());
+                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
                     }
+
 
                 } else {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 2).");
                 }
             }
-            // Ejecutar inserción masiva
-            pstmt.executeBatch();
+            try{
+                pstmt.executeBatch();
+            }
+            catch (SQLException e) {
+                ExcepcionAmigable.verificarErrorAmigable(e);
+            }
             System.out.println("Proceso de importación de Responsables finalizado.");
         }
     }

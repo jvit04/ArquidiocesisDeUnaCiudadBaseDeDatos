@@ -1,17 +1,19 @@
 package application;
 
 import utilities.ConexionBD;
+import utilities.ExcepcionAmigable;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Types;
 
-public interface importarPastoralesCSV {
+public class importarPastoralesCSV implements ExcepcionAmigable {
 
-    static void importarPastorales(File archivo) throws Exception {
+   public static void importarPastorales(File archivo) throws Exception {
         // La consulta llama a la función insert_pastorales con 3 parámetros
         String sql = "SELECT insert_pastorales(?, ?, ?)";
 
@@ -67,17 +69,24 @@ public interface importarPastoralesCSV {
                         // Añadir al lote
                         pstmt.addBatch();
 
-                    } catch (Exception e) {
-                        System.err.println("Error inesperado en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
                     }
+
 
                 } else {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 3).");
                 }
             }
 
-            // Ejecutar inserción masiva
-            pstmt.executeBatch();
+            try{
+                pstmt.executeBatch();
+            }
+            catch (SQLException e) {
+                ExcepcionAmigable.verificarErrorAmigable(e);
+            }
             System.out.println("Proceso de importación de Pastorales finalizado.");
         }
     }

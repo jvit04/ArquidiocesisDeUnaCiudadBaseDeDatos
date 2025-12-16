@@ -1,6 +1,7 @@
 package application;
 
 import utilities.ConexionBD;
+import utilities.ExcepcionAmigable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,10 +9,11 @@ import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-public interface importarRegistroSacramentoCSV {
+public class importarRegistroSacramentoCSV implements ExcepcionAmigable  {
 
-    static void importarRegistroSacramento(File archivo) throws Exception {
+    public static void importarRegistroSacramento(File archivo) throws Exception {
         String sql = "SELECT insert_registro_sacramento(?, ?::DATE, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
@@ -73,7 +75,7 @@ public interface importarRegistroSacramentoCSV {
                         pstmt.addBatch();
 
                     } catch (NumberFormatException e) {
-                        System.err.println("Error de formato numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
+                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
                     } catch (IllegalArgumentException e) {
                         System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
                     }
@@ -82,8 +84,12 @@ public interface importarRegistroSacramentoCSV {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 4).");
                 }
             }
-            // Ejecutar inserción masiva
-            pstmt.executeBatch();
+            try{
+                pstmt.executeBatch();
+            }
+            catch (SQLException e) {
+                ExcepcionAmigable.verificarErrorAmigable(e);
+            }
             System.out.println("Proceso de importación de Registro de Sacramentos finalizado.");
         }
     }

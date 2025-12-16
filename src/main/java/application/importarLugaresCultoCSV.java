@@ -1,16 +1,18 @@
 package application;
 
 import utilities.ConexionBD;
+import utilities.ExcepcionAmigable;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-public interface importarLugaresCultoCSV {
+public class importarLugaresCultoCSV implements ExcepcionAmigable{
 
-    static void importarLugaresCulto(File archivo) throws Exception {
+    public static void importarLugaresCulto(File archivo) throws Exception {
         // SQL basado en la función insert_lugares_culto (6 parámetros)
         String sql = "SELECT insert_lugares_culto(?, ?, ?, ?, ?, ?)";
 
@@ -96,7 +98,9 @@ public interface importarLugaresCultoCSV {
                         pstmt.addBatch();
 
                     } catch (NumberFormatException e) {
-                        System.err.println("Error de formato numérico (ID Parroquia o Capacidad) en línea " + numeroLinea + ": " + e.getMessage());
+                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
                     }
 
                 } else {
@@ -104,8 +108,12 @@ public interface importarLugaresCultoCSV {
                 }
             }
 
-            // Ejecutar inserción masiva
-            pstmt.executeBatch();
+            try{
+                pstmt.executeBatch();
+            }
+            catch (SQLException e) {
+                ExcepcionAmigable.verificarErrorAmigable(e);
+            }
             System.out.println("Proceso de importación de Lugares de Culto finalizado.");
         }
     }

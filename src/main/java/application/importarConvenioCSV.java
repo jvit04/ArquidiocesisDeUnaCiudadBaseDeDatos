@@ -1,18 +1,16 @@
 package application;
 
 import utilities.ConexionBD;
+import utilities.ExcepcionAmigable;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Types;
+import java.sql.*;
 
-public interface importarConvenioCSV {
+public class importarConvenioCSV implements ExcepcionAmigable {
 
-    static void importarConvenio(File archivo) throws Exception {
+    public static void importarConvenio(File archivo) throws Exception {
         // La consulta llama a la función insert_convenio con 8 parámetros según tu imagen
         String sql = "SELECT insert_convenio(?, ?, ?, ?::DATE, ?::DATE, ?, ?, ?)";
 
@@ -107,7 +105,7 @@ public interface importarConvenioCSV {
                         pstmt.addBatch();
 
                     } catch (NumberFormatException e) {
-                        System.err.println("Error de formato numérico (ID o Fecha) en línea " + numeroLinea + ": " + e.getMessage());
+                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
                     } catch (IllegalArgumentException e) {
                         System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
                     }
@@ -117,8 +115,12 @@ public interface importarConvenioCSV {
                 }
             }
 
-            // Ejecutar inserción masiva
-            pstmt.executeBatch();
+            try{
+                pstmt.executeBatch();
+            }
+            catch (SQLException e) {
+                ExcepcionAmigable.verificarErrorAmigable(e);
+            }
             System.out.println("Proceso de importación de Convenios finalizado.");
         }
     }

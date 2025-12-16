@@ -1,19 +1,17 @@
 package application;
 
 import utilities.ConexionBD;
+import utilities.ExcepcionAmigable;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Types;
+import java.sql.*;
 
-public interface importarProyectosPastoralesCSV {
+public class importarProyectosPastoralesCSV implements ExcepcionAmigable {
 
-    static void importarProyectosPastorales(File archivo) throws Exception {
+    public static void importarProyectosPastorales(File archivo) throws Exception {
         // La consulta llama a la función insert_proyectos_pastorales con 7 parámetros
         String sql = "SELECT insert_proyectos_pastorales(?, ?, ?, ?::DATE, ?::DATE, ?, ?)";
 
@@ -109,18 +107,22 @@ public interface importarProyectosPastoralesCSV {
                         pstmt.addBatch();
 
                     } catch (NumberFormatException e) {
-                        System.err.println("Error numérico (ID o Presupuesto) en línea " + numeroLinea + ": " + e.getMessage());
+                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
                     } catch (IllegalArgumentException e) {
-                        System.err.println("Error en formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
+                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
                     }
+
 
                 } else {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 7).");
                 }
             }
-
-            // Ejecutar inserción masiva
-            pstmt.executeBatch();
+            try{
+                pstmt.executeBatch();
+            }
+            catch (SQLException e) {
+                ExcepcionAmigable.verificarErrorAmigable(e);
+            }
             System.out.println("Proceso de importación de Proyectos Pastorales finalizado.");
         }
     }

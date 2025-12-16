@@ -1,17 +1,19 @@
 package application;
 
 import utilities.ConexionBD;
+import utilities.ExcepcionAmigable;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Types;
 
-public interface importarVicariasCSV {
+public class importarVicariasCSV implements ExcepcionAmigable {
 
-    static void importarVicarias(File archivo) throws Exception {
+    public static void importarVicarias(File archivo) throws Exception {
         String sql = "SELECT insert_vicaria(?, ?, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
@@ -73,16 +75,23 @@ public interface importarVicariasCSV {
                         // Añadir al lote
                         pstmt.addBatch();
 
-                    } catch (Exception e) {
-                        System.err.println("Error inesperado en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
                     }
+
 
                 } else {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 4).");
                 }
             }
-            // Ejecutar inserción masiva
-            pstmt.executeBatch();
+            try{
+                pstmt.executeBatch();
+            }
+            catch (SQLException e) {
+                ExcepcionAmigable.verificarErrorAmigable(e);
+            }
             System.out.println("Proceso de importación de Vicarías finalizado.");
         }
     }

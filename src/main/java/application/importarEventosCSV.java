@@ -1,6 +1,7 @@
 package application;
 
 import utilities.ConexionBD;
+import utilities.ExcepcionAmigable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,13 +9,14 @@ import java.io.FileReader;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-public interface importarEventosCSV {
+public class importarEventosCSV implements ExcepcionAmigable {
 
-    static void importarEventos(File archivo) throws Exception {
+  public static void importarEventos(File archivo) throws Exception {
         String sql = "SELECT insert_evento(?, ?, ?::TIMESTAMP, ?::TIMESTAMP, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
@@ -23,7 +25,7 @@ public interface importarEventosCSV {
 
             String linea;
             int numeroLinea = 0;
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
             while ((linea = br.readLine()) != null) {
                 numeroLinea++;
@@ -100,8 +102,11 @@ public interface importarEventosCSV {
                         pstmt.addBatch();
 
                     } catch (NumberFormatException e) {
-                        System.err.println("Error de formato numérico (ID o Presupuesto) en línea " + numeroLinea + ": " + e.getMessage());
-                    } catch (DateTimeParseException e) {
+                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
+                    }
+                     catch (DateTimeParseException e) {
                         System.err.println("Error de formato de Fecha/Hora en línea " + numeroLinea + ": " + e.getMessage());
                     }
 
@@ -109,8 +114,12 @@ public interface importarEventosCSV {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 6).");
                 }
             }
-            // Ejecutar inserción masiva
-            pstmt.executeBatch();
+            try{
+                pstmt.executeBatch();
+            }
+            catch (SQLException e) {
+                ExcepcionAmigable.verificarErrorAmigable(e);
+            }
             System.out.println("Proceso de importación de Eventos finalizado.");
         }
     }
