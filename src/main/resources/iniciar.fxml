@@ -176,7 +176,7 @@
             <Font name="Marcellus" size="12.0" />
          </font>
       </Label>
-      <DatePicker fx:id="registroDatePickerFF" layoutX="400.0" layoutY="286.0" prefHeight="26.0" prefWidth="152.0" visible="false" />
+      <DatePicker fx:id="registroDatePickerFF" focusTraversable="false" layoutX="400.0" layoutY="286.0" prefHeight="26.0" prefWidth="152.0" visible="false" />
       <Label fx:id="labelArquidiocesis3" layoutX="280.0" layoutY="24.0" text="Arquidiócesis" textAlignment="CENTER" textFill="#2f3e28">
          <font>
             <Font name="Cinzel Regular" size="25.0" />
