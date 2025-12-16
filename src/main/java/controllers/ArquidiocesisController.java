@@ -20,11 +20,14 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import utilities.RegexPatterns;
 import javafx.scene.control.ChoiceBox;
+
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 import javafx.scene.control.Alert;
 import java.time.LocalDate;
 
+import static utilities.guardarArchivoEnRuta.guardarArchivo;
+// Clase de los controladores java fx y los metodos que implementan
 public class ArquidiocesisController implements cargarClerigos, guardarParroquiaSQL , cargarVicarias {
     @FXML
     private AnchorPane ancorPane1;
@@ -179,16 +182,11 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
 
     private File archivoSeleccionado;
 
-
+//metodo que guarda los párrocos en el comboBox
     void setRegistroComboBoxParroco(){
         registroComboBoxParroco.getItems().clear();
-        registroComboBoxParroco.getItems().addAll(cargarClerigos.cargarClerigos());
+        registroComboBoxParroco.getItems().addAll(cargarClerigos.cargar());
     }
-
-void setRegistroChoiceBoxCiudad(){
-        registroChoiceBoxCiudad.getItems().clear();
-        registroChoiceBoxCiudad.getItems().addAll(cargarCiudades.cargarCiudades());
-}
 
 
     @FXML
@@ -206,6 +204,7 @@ void setRegistroChoiceBoxCiudad(){
         imageCatedral.setVisible(true);
 
     }
+    //metodo para regresar al menu principal
     @FXML
     void regresarInicio(ActionEvent event) {
         initialize();
@@ -266,7 +265,6 @@ void setRegistroChoiceBoxCiudad(){
         registroLabelFechaF.setVisible(false);
         registroDatePickerFF.setVisible(false);
         registroBotonEnviar.setVisible(false);
-
         registroChoiceBoxVicaria.getItems().addAll(cargarVicarias.cargarVicarias());
         registroChoiceBoxVicaria.getSelectionModel().selectFirst();
         registroChoiceBoxVicaria.getSelectionModel().selectedItemProperty().addListener((observable, valorAnterior, valorNuevo) -> {
@@ -302,6 +300,8 @@ void setRegistroChoiceBoxCiudad(){
             e.printStackTrace(); // Imprime el error si falla la conexión
         }
     }
+    //Este metodo permite configurar el ChoiceBox de ciudad para que cambie de acuerdo a la vicaria seleccionada
+    //Solo permite elección con la Vicaria Daule-Samborondón
     private void configurarCiudadSegunVicaria(String vicariaSeleccionada) {
         if (vicariaSeleccionada == null) return;
 
@@ -325,12 +325,14 @@ void setRegistroChoiceBoxCiudad(){
                 break;
         }
     }
-
+//El metodo selecciona la ciudad una vez elegida la vicaria
     private void bloquearYAsignarCiudad(String nombreCiudad) {
         registroChoiceBoxCiudad.setItems(FXCollections.observableArrayList(nombreCiudad));
         registroChoiceBoxCiudad.setValue(nombreCiudad); // se selecciona una ciudad automaticamente
         registroChoiceBoxCiudad.setDisable(true);
     }
+
+
     @FXML
     void crearParroquia(ActionEvent event) {
         registroComboBoxParroco.getSelectionModel().selectFirst();
@@ -465,6 +467,8 @@ void setRegistroChoiceBoxCiudad(){
             registroBotonEnviar.setDisable(false);
         }
     }
+    //Metodo que permite refrescar los datos, para evitar que se mantengan los datos recién usados.
+    // Es decir, una vez registrada la parroquia, limpia los datos para que nose pulse el boton enviar de manera indefinida.
     void refrescarCrearParroquia(){
         setRegistroComboBoxParroco();
         registroComboBoxParroco.getSelectionModel().selectFirst();
@@ -629,24 +633,62 @@ void setRegistroChoiceBoxCiudad(){
         String nombreArchivo = archivoSeleccionado.getName().toLowerCase().replace(".csv", "");
 
         try {
-            switch (nombreArchivo) {
+            switch (nombreArchivo.toLowerCase()) {
+
                 case "actividades":
                     importarActividadesCSV.importarActividades(archivoSeleccionado);
                     break;
-                case "parroquias":
+                case "parroquia":
                     importarParroquiasCSV.importarParroquias(archivoSeleccionado);
                     break;
-                case "sacerdotes":
-                    //importarSacerdotes(archivoSeleccionado);
+                case "clerigo":
+                    importarClerigoCSV.importarClerigo(archivoSeleccionado);
                     break;
+
+                case "convenio":
+                    importarConvenioCSV.importarConvenio(archivoSeleccionado);
+                    break;
+
+                case "evento":
+                    importarEventosCSV.importarEventos(archivoSeleccionado);
+                    break;
+
+                case "lugares_culto":
+                    importarLugaresCultoCSV.importarLugaresCulto(archivoSeleccionado);
+                    break;
+
+                case "pastorales":
+                    importarPastoralesCSV.importarPastorales(archivoSeleccionado);
+                    break;
+
+                case "proyectos_pastorales":
+                    importarProyectosPastoralesCSV.importarProyectosPastorales(archivoSeleccionado);
+                    break;
+
+                case "receptor_sacramento":
+                    importarReceptorSacramentoCSV.importarReceptorSacramento(archivoSeleccionado);
+                    break;
+
+                case "registro_sacramento":
+                    importarRegistroSacramentoCSV.importarRegistroSacramento(archivoSeleccionado);
+                    break;
+
+                case "responsable":
+                    importarResponsableCSV.importarResponsable(archivoSeleccionado);
+                    break;
+
+                case "vicaria":
+                    importarVicariasCSV.importarVicarias(archivoSeleccionado);
+                    break;
+
                 default:
                     mostrarAlerta("Archivo Desconocido",
-                            "El nombre del archivo (" + nombreArchivo + ") no coincide con ninguna tabla registrada.");
+                            "El archivo '" + nombreArchivo + "' no corresponde a ninguna tabla configurada.");
                     return;
             }
 
 
-            mostrarAlerta("Éxito", "Los datos de " + nombreArchivo + " se importaron correctamente.");
+            mostrarAlerta("Éxito", "Importación de " + nombreArchivo + " completada correctamente.");
             textFieldRutaArchivo.clear();
             archivoSeleccionado = null;
 
@@ -656,10 +698,30 @@ void setRegistroChoiceBoxCiudad(){
         }
     }
 
+    @FXML
+    void descargarPDF(ActionEvent event) {
+        Node source = (Node) event.getSource();
+        Stage stage = (Stage) source.getScene().getWindow();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Guardar Archivo PDF");
+        fileChooser.setInitialFileName("ReportesArquidiocesis.pdf"); // Nombre por defecto
+
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf")
+        );
+
+        File fileDestino = fileChooser.showSaveDialog(stage);
+
+        if (fileDestino != null) {
+            guardarArchivo(fileDestino);
+        }
+    }
 
 
 
-    // Método auxiliar para mostrar alertas en JavaFX
+
+//     Método auxiliar para mostrar alertas en JavaFX
     private void mostrarAlerta(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);

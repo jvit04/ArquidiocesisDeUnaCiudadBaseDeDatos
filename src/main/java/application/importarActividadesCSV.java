@@ -1,91 +1,108 @@
 package application;
 
 import utilities.ConexionBD;
+import utilities.ExcepcionAmigable;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Types;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.sql.*;
 
-public interface importarActividadesCSV {
+//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
+public class importarActividadesCSV implements ExcepcionAmigable {
 
-    static void importarActividades(File archivo) throws Exception {
-        String sql = "SELECT insert_actividades(?, ?, ?::DATE, ?, ?)";
+   public static void importarActividades(File archivo) throws Exception {
+        String sql = "SELECT insert_actividades(?, ?, ?::DATE, ?::TIME, ?)";
 
         try (Connection connection = ConexionBD.conectar();
              PreparedStatement pstmt = connection.prepareStatement(sql);
              BufferedReader br = new BufferedReader(new FileReader(archivo))) {
 
             String linea;
-            int numeroLinea = 0; // Para saber en qué línea falló
+            int numeroLinea = 0;
 
             while ((linea = br.readLine()) != null) {
                 numeroLinea++;
                 String[] datos = linea.split(";", -1);
 
-                // Verificamos que tenga las 5 columnas
+                // Verificamos que tenga las 5 columnas necesarias
                 if (datos.length >= 5) {
 
-                    // --- VALIDACIÓN DE CAMPO OBLIGATORIO: ID_VICARIA (Índice 1) ---
-                    String idCultoStr = datos[1].trim();
-                    if (idCultoStr.isEmpty()) {
-                        System.err.println("Error en línea " + numeroLinea + ": El ID_VICARIA está vacío y es obligatorio. Se omite el registro.");
-                        continue; // Saltamos al siguiente ciclo while (siguiente línea del CSV)
+                    // -- 1. Nombre (Obligatorio) --
+                    String nombre = datos[0].trim().replace("\uFEFF", "");
+                    if (nombre.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Nombre vacío. Registro omitido.");
+                        continue;
                     }
 
-                    // --- VALIDACIÓN DE CAMPO OBLIGATORIO: ID FINAL (Índice 8) ---
-                    String idFinalStr = datos[8].trim();
-                    if (idFinalStr.isEmpty()) {
-                        System.err.println("Error en línea " + numeroLinea + ": El ID FINAL (Clérigo) está vacío. Se omite el registro.");
+                    // -- 2. ID Lugar Culto (Obligatorio - Integer) --
+                    String idLugarStr = datos[1].trim();
+                    if (idLugarStr.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": ID Lugar de Culto vacío. Registro omitido.");
+                        continue;
+                    }
+
+                    // -- 3. Fecha (Obligatorio - Date) --
+                    String fechaStr = datos[2].trim();
+                    if (fechaStr.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Fecha vacía. Registro omitido.");
+                        continue;
+                    }
+
+                    // -- 4. Hora (Obligatorio - Time) --
+                    String horaStr = datos[3].trim();
+                    if (horaStr.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Hora vacía. Registro omitido.");
+                        continue;
+                    }
+
+                    // -- 5. Responsable (Obligatorio - Varchar) --
+                    String responsable = datos[4].trim();
+                    if (responsable.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Responsable vacío. Registro omitido.");
                         continue;
                     }
 
                     try {
-                        // 1. Nombre Actividad
-                        pstmt.setString(1, datos[0].trim().replace("\uFEFF", ""));
+                        // Asignación de parámetros (Orden estricto de la función)
 
-                        // 2. ID Lugar Culto
-                        pstmt.setInt(2, Integer.parseInt(idCultoStr));
+                        // 1. p_nombre
+                        pstmt.setString(1, nombre);
 
-                        // 3. Fecha de la Actividad
-                        try {
-                            String fechaStr = datos[2].trim();
-                            if (fechaStr.isEmpty()) {
-                                pstmt.setNull(3, Types.DATE); // O lanza error si la fecha es obligatoria
-                            } else {
-                                pstmt.setDate(3, Date.valueOf(fechaStr));
-                            }
-                        } catch (IllegalArgumentException e) {
-                            System.err.println("Advertencia en línea " + numeroLinea + ": Fecha inválida, se guardará como NULL.");
-                            pstmt.setNull(3, Types.DATE);
-                        }
+                        // 2. p_id_lugares_culto
+                        pstmt.setInt(2, Integer.parseInt(idLugarStr));
 
-                        // 4. Hora
-                        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                        pstmt.setObject(4, LocalDateTime.parse(datos[3].trim(), fmt));
+                        // 3. p_fecha (Conversión estricta, si falla salta al catch)
+                        pstmt.setDate(3, Date.valueOf(fechaStr));
 
-                        // 5. Responsable
-                        pstmt.setString(5, datos[4].trim());
+                        // 4. p_hora
+                        if (horaStr.length() == 5) { horaStr += ":00"; }
+                        pstmt.setTime(4, Time.valueOf(horaStr));
+
+                        // 5. p_responsable
+                        pstmt.setString(5, responsable);
 
                         // Añadir al lote
                         pstmt.addBatch();
 
                     } catch (NumberFormatException e) {
                         System.err.println("Error de formato numérico en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error de formato de Fecha/Hora en línea " + numeroLinea + ": " + e.getMessage());
                     }
 
+
                 } else {
-                    System.err.println("Línea " + numeroLinea + " omitida: Formato incorrecto (columnas insuficientes).");
+                    System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 5).");
                 }
             }
-            // Ejecutar inserción masiva
-            pstmt.executeBatch();
-            System.out.println("Proceso finalizado.");
+           try{
+               pstmt.executeBatch();
+           }
+           catch (SQLException e) {
+               ExcepcionAmigable.verificarErrorAmigable(e);
+           }
+            System.out.println("Proceso de importación de Actividades finalizado.");
         }
     }
 }

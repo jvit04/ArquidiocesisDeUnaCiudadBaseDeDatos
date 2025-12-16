@@ -1,5 +1,5 @@
 package application;
-
+//Clase que sirve para mostrar en un comboBox las vicarias disponibles.
 public class Vicaria {
     private int idVicaria;
     private String nombreVicaria;

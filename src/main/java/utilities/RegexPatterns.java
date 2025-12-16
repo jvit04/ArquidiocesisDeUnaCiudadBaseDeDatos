@@ -1,5 +1,5 @@
 package utilities;
-
+//En esta clase hay patrones regex, los cuales son utiles para validar cadenas de caracteres, sin tener que usar condicionales
 public class RegexPatterns {
     public static final String NOMBRE_REGEX = "^[A-Za-zÁÉÍÓÚáéíóúñÑüÜ\\s]+$";
     public static final String DIRECCION_REGEX = "^[a-zA-ZÁÉÍÓÚáéíóúñÑüÜ0-9\\s.,#\\\\-\\\\/°()'\\\\u0022]+$"; //Av. Siempre Viva 123

@@ -1,5 +1,5 @@
 package application;
-
+// Clase que permite almacenar cada registro de la vista que se muestra en la interfaz
 public class VistaReporte {
 private String vicariaResponsable;
 private int proyectosTotales;

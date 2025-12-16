@@ -5,9 +5,10 @@ import utilities.Paths;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+//Metodo cargar, su proposito es que gracias a la función de la base obtener_ciudades, devuelva una lista de
+//las ciudades que abarca la arquidiócesis
 public interface cargarCiudades {
-    static List<String> cargarCiudades() {
+    static List<String> cargar() {
         List<String> ciudades = new ArrayList<>();
 
 

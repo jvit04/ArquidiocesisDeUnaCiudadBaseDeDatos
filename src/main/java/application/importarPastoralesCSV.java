@@ -11,10 +11,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 //Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
-public class importarVicariasCSV implements ExcepcionAmigable {
+public class importarPastoralesCSV implements ExcepcionAmigable {
 
-    public static void importarVicarias(File archivo) throws Exception {
-        String sql = "SELECT insert_vicaria(?, ?, ?, ?)";
+   public static void importarPastorales(File archivo) throws Exception {
+        // La consulta llama a la función insert_pastorales con 3 parámetros
+        String sql = "SELECT insert_pastorales(?, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
              PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -27,50 +28,43 @@ public class importarVicariasCSV implements ExcepcionAmigable {
                 numeroLinea++;
                 String[] datos = linea.split(";", -1);
 
-                if (datos.length >= 4) {
+                // Verificamos que tenga las 3 columnas necesarias
+                if (datos.length >= 3) {
 
                     // -- 1. Nombre (Obligatorio) --
+                    // Limpieza de BOM para el primer campo
                     String nombre = datos[0].trim().replace("\uFEFF", "");
                     if (nombre.isEmpty()) {
-                        System.err.println("Línea " + numeroLinea + ": Nombre de Vicaria vacío. Registro omitido.");
+                        System.err.println("Línea " + numeroLinea + ": Nombre vacío. Registro omitido.");
                         continue;
                     }
 
-                    // -- 2. Descripción (OPCIONAL/NULLABLE) --
-                    String descripcion = datos[1].trim();
-
-                    // -- 3. Email (Obligatorio) --
-                    String email = datos[2].trim();
-                    if (email.isEmpty()) {
-                        System.err.println("Línea " + numeroLinea + ": Email vacío. Registro omitido.");
+                    // -- 2. Ámbito (Obligatorio) --
+                    String ambito = datos[1].trim();
+                    if (ambito.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Ámbito vacío. Registro omitido.");
                         continue;
                     }
 
-                    // -- 4. Teléfono (Obligatorio) --
-                    String telefono = datos[3].trim();
-                    if (telefono.isEmpty()) {
-                        System.err.println("Línea " + numeroLinea + ": Teléfono vacío. Registro omitido.");
-                        continue;
-                    }
+                    // -- 3. Descripción (OPCIONAL/NULLABLE) --
+                    String descripcion = datos[2].trim();
 
                     try {
-                        // Asignación de parámetros
+                        // Asignación de parámetros al PreparedStatement
 
                         // 1. p_nombre
                         pstmt.setString(1, nombre);
 
-                        // 2. p_descripcion (Único NULLABLE)
+                        // 2. p_ambito
+                        pstmt.setString(2, ambito);
+
+                        // 3. p_descripcion
+                        // Lógica para permitir nulos solo en este campo
                         if (descripcion.isEmpty() || descripcion.equalsIgnoreCase("NULL")) {
-                            pstmt.setNull(2, Types.VARCHAR); // Usamos VARCHAR o CLOB según corresponda a 'text'
+                            pstmt.setNull(3, Types.VARCHAR);
                         } else {
-                            pstmt.setString(2, descripcion);
+                            pstmt.setString(3, descripcion);
                         }
-
-                        // 3. p_email
-                        pstmt.setString(3, email);
-
-                        // 4. p_telefono
-                        pstmt.setString(4, telefono);
 
                         // Añadir al lote
                         pstmt.addBatch();
@@ -83,16 +77,17 @@ public class importarVicariasCSV implements ExcepcionAmigable {
 
 
                 } else {
-                    System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 4).");
+                    System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 3).");
                 }
             }
+
             try{
                 pstmt.executeBatch();
             }
             catch (SQLException e) {
                 ExcepcionAmigable.verificarErrorAmigable(e);
             }
-            System.out.println("Proceso de importación de Vicarías finalizado.");
+            System.out.println("Proceso de importación de Pastorales finalizado.");
         }
     }
 }

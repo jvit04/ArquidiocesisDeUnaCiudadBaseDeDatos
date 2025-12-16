@@ -1,84 +1,126 @@
 package application;
 
 import utilities.ConexionBD;
+import utilities.ExcepcionAmigable;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Types;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
+public class importarEventosCSV implements ExcepcionAmigable {
 
-public interface importarEventosCSV {
-
-    static void importarEventos(File archivo) throws Exception {
-        String sql = "SELECT insert_evento(?, ?, ?, ?, ?, ?)";
+  public static void importarEventos(File archivo) throws Exception {
+        String sql = "SELECT insert_evento(?, ?, ?::TIMESTAMP, ?::TIMESTAMP, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
              PreparedStatement pstmt = connection.prepareStatement(sql);
              BufferedReader br = new BufferedReader(new FileReader(archivo))) {
 
             String linea;
-            int numeroLinea = 0; // Para saber en qué línea falló
+            int numeroLinea = 0;
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
             while ((linea = br.readLine()) != null) {
                 numeroLinea++;
                 String[] datos = linea.split(";", -1);
 
-                // Verificamos que tenga las 9 columnas
-                if (datos.length >= 9) {
+                // Verificamos que tenga las 6 columnas necesarias
+                if (datos.length >= 6) {
 
-                    // --- VALIDACIÓN DE CAMPO OBLIGATORIO: ID_VICARIA (Índice 1) ---
-                    String idCultoStr = datos[4].trim();
-                    if (idCultoStr.isEmpty()) {
-                        System.err.println("Error en línea " + numeroLinea + ": El ID_VICARIA está vacío y es obligatorio. Se omite el registro.");
-                        continue; // Saltamos al siguiente ciclo while (siguiente línea del CSV)
+                    // -- 1. Nombre (Obligatorio) --
+                    String nombre = datos[0].trim().replace("\uFEFF", "");
+                    if (nombre.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Nombre vacío. Registro omitido.");
+                        continue;
+                    }
+
+                    // -- 2. Categoría (Obligatorio) --
+                    String categoria = datos[1].trim();
+                    if (categoria.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Categoría vacía. Registro omitido.");
+                        continue;
+                    }
+
+                    // -- 3. Fecha Inicio (Obligatorio) --
+                    String fechaIniStr = datos[2].trim();
+                    if (fechaIniStr.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Fecha Inicio vacía. Registro omitido.");
+                        continue;
+                    }
+
+                    // -- 4. Fecha Fin (Obligatorio) --
+                    String fechaFinStr = datos[3].trim();
+                    if (fechaFinStr.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Fecha Fin vacía. Registro omitido.");
+                        continue;
+                    }
+
+                    // -- 5. ID Lugar Culto (Obligatorio - Integer) --
+                    String idLugarStr = datos[4].trim();
+                    if (idLugarStr.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": ID Lugar Culto vacío. Registro omitido.");
+                        continue;
+                    }
+
+                    // -- 6. Presupuesto (Obligatorio - Numeric) --
+                    String presupuestoStr = datos[5].trim();
+                    if (presupuestoStr.isEmpty()) {
+                        System.err.println("Línea " + numeroLinea + ": Presupuesto vacío. Registro omitido.");
+                        continue;
                     }
 
                     try {
-                        // 1. Nombre Evento
-                        pstmt.setString(1, datos[0].trim().replace("\uFEFF", ""));
+                        // Asignación de parámetros
 
-                        // 2. Categoria
-                        pstmt.setString(2, datos[1].trim().replace("\uFEFF", ""));
+                        // 1. p_nombre
+                        pstmt.setString(1, nombre);
 
-                        // 3. Fecha hora de inicio
-                        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                        pstmt.setObject(3, LocalDateTime.parse(datos[2].trim(), fmt));
+                        // 2. p_categoria
+                        pstmt.setString(2, categoria);
 
-                        // 4. Fecha y hora de fin
-                        pstmt.setObject(4, LocalDateTime.parse(datos[3].trim(), fmt));
+                        // 3. p_fecha_hora_inicio
+                        pstmt.setObject(3, LocalDateTime.parse(fechaIniStr, fmt));
 
-                        // 5. Lugar Culto
-                        pstmt.setInt(5, Integer.parseInt(idCultoStr));
+                        // 4. p_fecha_hora_fin
+                        pstmt.setObject(4, LocalDateTime.parse(fechaFinStr, fmt));
 
-                        // 6. Presupuesto
-                        BigDecimal presupuesto;
-                        try {
-                            presupuesto = new BigDecimal(datos[5].trim());
-                        } catch (NumberFormatException e) {
-                            presupuesto = BigDecimal.ZERO; // O lanza error
-                        }
-                        pstmt.setBigDecimal(6, presupuesto);
+                        // 5. p_id_lugar_culto
+                        pstmt.setInt(5, Integer.parseInt(idLugarStr));
+
+                        // 6. p_presupuesto
+                        // Reemplazamos coma por punto por seguridad (ej: 10,50 -> 10.50)
+                        pstmt.setBigDecimal(6, new BigDecimal(presupuestoStr.replace(",", ".")));
 
                         // Añadir al lote
                         pstmt.addBatch();
 
                     } catch (NumberFormatException e) {
-                        System.err.println("Error de formato numérico en línea " + numeroLinea + ": " + e.getMessage());
+                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
+                    }
+                     catch (DateTimeParseException e) {
+                        System.err.println("Error de formato de Fecha/Hora en línea " + numeroLinea + ": " + e.getMessage());
                     }
 
                 } else {
-                    System.err.println("Línea " + numeroLinea + " omitida: Formato incorrecto (columnas insuficientes).");
+                    System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 6).");
                 }
             }
-            // Ejecutar inserción masiva
-            pstmt.executeBatch();
-            System.out.println("Proceso finalizado.");
+            try{
+                pstmt.executeBatch();
+            }
+            catch (SQLException e) {
+                ExcepcionAmigable.verificarErrorAmigable(e);
+            }
+            System.out.println("Proceso de importación de Eventos finalizado.");
         }
     }
 }
