@@ -6,6 +6,5 @@ public class Paths {
     public static final String UrlBaseDatos= "jdbc:postgresql://localhost:5432/Archidiocesis";
     public static final String USER="postgres";
     public static final String PASSWORD = "Jviteri.5519";
-    public static final String RUTA_ARCHIVO = "parroquias.sql";
+    public static final String REPORTES = "/Proyecto Periodo Ordinario II 2025.pdf";
 }
-

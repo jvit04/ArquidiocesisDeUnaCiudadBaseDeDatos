@@ -119,7 +119,7 @@
             <Cursor fx:constant="DEFAULT" />
          </cursor>
       </TableView>
-      <Button fx:id="botonDescargar" layoutX="316.0" layoutY="324.0" mnemonicParsing="false" prefWidth="193.0" styleClass="boton-elegante" stylesheets="@botonesSueltosArquidiocesis.css" text="Descargar" visible="false" />
+      <Button fx:id="botonDescargar" layoutX="316.0" layoutY="324.0" mnemonicParsing="false" onAction="#descargarPDF" prefWidth="193.0" styleClass="boton-elegante" stylesheets="@botonesSueltosArquidiocesis.css" text="Descargar" visible="false" />
       <Label fx:id="registroLabelDescripcion" layoutX="263.0" layoutY="63.0" text="Registrar parroquia en la Arquidiócesis ">
          <font>
             <Font name="Marcellus" size="12.0" />

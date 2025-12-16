@@ -20,9 +20,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import utilities.RegexPatterns;
 import javafx.scene.control.ChoiceBox;
-import java.sql.*;
+
 import java.time.LocalDate;
 import java.util.regex.Pattern;
+
+import static utilities.guardarArchivoEnRuta.guardarArchivo;
 
 public class ArquidiocesisController implements cargarClerigos, guardarParroquiaSQL , cargarVicarias {
     @FXML
@@ -680,6 +682,26 @@ void setRegistroChoiceBoxCiudad(){
         } catch (Exception e) {
             e.printStackTrace();
             mostrarAlerta("Error de Base de Datos", "Falló la importación: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    void descargarPDF(ActionEvent event) {
+        Node source = (Node) event.getSource();
+        Stage stage = (Stage) source.getScene().getWindow();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Guardar Archivo PDF");
+        fileChooser.setInitialFileName("ReportesArquidiocesis.pdf"); // Nombre por defecto
+
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf")
+        );
+
+        File fileDestino = fileChooser.showSaveDialog(stage);
+
+        if (fileDestino != null) {
+            guardarArchivo(fileDestino);
         }
     }
 
