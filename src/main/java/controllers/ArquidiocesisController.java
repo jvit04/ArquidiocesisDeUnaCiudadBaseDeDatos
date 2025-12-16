@@ -212,6 +212,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
 
     @FXML
     void initialize(){
+        registroChoiceBoxVicaria.getItems().clear();
         registroDatePickerFF.setDayCellFactory(param -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
@@ -265,7 +266,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         registroLabelFechaF.setVisible(false);
         registroDatePickerFF.setVisible(false);
         registroBotonEnviar.setVisible(false);
-        registroChoiceBoxVicaria.getItems().addAll(cargarVicarias.cargarVicarias());
+      registroChoiceBoxVicaria.getItems().addAll(cargarVicarias.cargarVicarias());
         registroChoiceBoxVicaria.getSelectionModel().selectFirst();
         registroChoiceBoxVicaria.getSelectionModel().selectedItemProperty().addListener((observable, valorAnterior, valorNuevo) -> {
             configurarCiudadSegunVicaria(valorNuevo.toString());});
