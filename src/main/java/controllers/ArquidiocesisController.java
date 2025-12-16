@@ -20,9 +20,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import utilities.RegexPatterns;
 import javafx.scene.control.ChoiceBox;
-import java.sql.*;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
+import javafx.scene.control.Alert;
+import java.time.LocalDate;
 
 public class ArquidiocesisController implements cargarClerigos, guardarParroquiaSQL , cargarVicarias {
     @FXML
@@ -220,9 +221,6 @@ void setRegistroChoiceBoxCiudad(){
                 setDisable(empty || date.isAfter(LocalDate.now()));
             }
         });
-        registroDatePickerFF.addEventFilter(javafx.scene.input.KeyEvent.KEY_TYPED, event -> {
-            event.consume();
-        });
         setRegistroComboBoxParroco();
         labelArquidiocesis2.setVisible(false);
         labelArquidiocesis1.setVisible(true);
@@ -387,37 +385,47 @@ void setRegistroChoiceBoxCiudad(){
         String email = registroTxtFieldEmail.getText();
         LocalDate fechaFundacion = registroDatePickerFF.getValue();
 
-                 if (nombreParroquia == null || nombreParroquia.trim().isEmpty()
-                         || ciudad == null || ciudad.trim().isEmpty()
-                         || direccion == null || direccion.trim().isEmpty()
-                         || fechaFundacion == null
-                 ) {
-                    mostrarAlerta("Error","Rellene los campos necesarios.");
-                     return;
-                }
-                 if (telefono.trim().isEmpty()){
-                     telefono =null;
-                 }
-                 if (sitioWeb.trim().isEmpty()){
-                     sitioWeb=null;
-                 }
-                 if (email.trim().isEmpty()){
-                     email=null;
-                 }
+        if (fechaFundacion == null) {
+            mostrarAlerta("Error", "Debe ingresar la fecha de fundacion.");
+            return;
+        }
+
+        if (fechaFundacion.isAfter(LocalDate.now())) {
+            mostrarAlerta(
+                    "Fecha invalida",
+                    "La fecha de fundacion no puede ser posterior a la fecha actual."
+            );
+            return;
+        }
+        if (nombreParroquia == null || nombreParroquia.trim().isEmpty()
+                || ciudad == null || ciudad.trim().isEmpty()
+                || direccion == null || direccion.trim().isEmpty()
+                || fechaFundacion == null
+        ) {
+            mostrarAlerta("Error","Rellene los campos necesarios.");
+            return;
+        }
+        if (telefono.trim().isEmpty()){
+            telefono =null;
+        }
+        if (sitioWeb.trim().isEmpty()){
+            sitioWeb=null;
+        }
+        if (email.trim().isEmpty()){
+            email=null;
+        }
 
 
-                //Se va a validar los campos con formatos REGEX
-                if (!Pattern.matches(RegexPatterns.NOMBRE_REGEX,nombreParroquia) ) {
-                    mostrarAlerta("Error","Formato invalido en campo Nombre de la Parroquia.");
+        //Se va a validar los campos con formatos REGEX
+        if (!Pattern.matches(RegexPatterns.NOMBRE_REGEX,nombreParroquia) ) {
+            mostrarAlerta("Error","Formato invalido en campo Nombre de la Parroquia.");
+            return;
+        }
 
-                    return;
-                }
-
-            if (!Pattern.matches(RegexPatterns.NOMBRE_REGEX,ciudad) ) {
-                mostrarAlerta("Error","Formato invalido en campo Ciudad.");
-
-                return;
-            }
+        if (!Pattern.matches(RegexPatterns.NOMBRE_REGEX,ciudad) ) {
+            mostrarAlerta("Error","Formato invalido en campo Ciudad.");
+            return;
+        }
         if (!Pattern.matches(RegexPatterns.DIRECCION_REGEX,direccion) ) {
             mostrarAlerta("Error","Formato invalido en campo Dirección.");
 
@@ -438,10 +446,10 @@ void setRegistroChoiceBoxCiudad(){
 
 
 
-            if (email != null && !Pattern.matches(RegexPatterns.EMAIL_REGEX,email) ) {
-                    mostrarAlerta("Error","Formato invalido en campo Email. Ej: arquidiocesis@gmail.com");
-                    return;
-            }
+        if (email != null && !Pattern.matches(RegexPatterns.EMAIL_REGEX,email) ) {
+            mostrarAlerta("Error","Formato invalido en campo Email. Ej: arquidiocesis@gmail.com");
+            return;
+        }
 
         registroBotonEnviar.setDisable(true);
         try {
