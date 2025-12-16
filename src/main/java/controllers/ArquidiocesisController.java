@@ -220,6 +220,9 @@ void setRegistroChoiceBoxCiudad(){
                 setDisable(empty || date.isAfter(LocalDate.now()));
             }
         });
+        registroDatePickerFF.addEventFilter(javafx.scene.input.KeyEvent.KEY_TYPED, event -> {
+            event.consume();
+        });
         setRegistroComboBoxParroco();
         labelArquidiocesis2.setVisible(false);
         labelArquidiocesis1.setVisible(true);
