@@ -9,7 +9,7 @@ import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
+//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarResponsableCSV implements ExcepcionAmigable {
 
     public static void importarResponsable(File archivo) throws Exception {

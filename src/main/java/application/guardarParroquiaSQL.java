@@ -4,10 +4,9 @@ import utilities.ConexionBD;
 
 import java.sql.*;
 
-
+//Esta interfaz permite, guardar la parroquia que registra el usuario en la base.
 public interface guardarParroquiaSQL {
 
-    // Agregamos 'throws SQLException' para avisar que este método puede fallar
     static void guardarEnSQL(Parroquia p) throws SQLException {
 
         String sql = "select insert_parroquia(?,?,?,?,?,?,?,?::DATE,?)";

@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-
+//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarEventosCSV implements ExcepcionAmigable {
 
   public static void importarEventos(File archivo) throws Exception {

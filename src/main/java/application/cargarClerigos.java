@@ -6,9 +6,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-//interfaz que se encarga de cargar los clerigos almacenados en la base a través de una función
+//interfaz que se encarga de cargar los clerigos almacenados en la base a través de la función fn_parroco
+// la cual recoleta los clerigos que son párrocos y no han sido asignados a una parroquia.
+
 public interface cargarClerigos {
-    static List<Clerigo> cargarClerigos(){
+    static List<Clerigo> cargar(){
         List<Clerigo> clerigos = new ArrayList<>();
 
 

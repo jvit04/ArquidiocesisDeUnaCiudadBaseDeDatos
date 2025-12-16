@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.sql.*;
 
+//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarActividadesCSV implements ExcepcionAmigable {
 
    public static void importarActividades(File archivo) throws Exception {

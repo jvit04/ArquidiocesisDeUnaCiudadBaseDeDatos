@@ -1,5 +1,6 @@
 package application;
-
+//Clase Clerigo, se combina con la interfaz cargarClerigos para obtener los párrocos, los cuales son necesarios
+// para el registro en parroquia.
 public class Clerigo {
     private int id_clerigo;
     private String nombres;

@@ -9,11 +9,10 @@ import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
+//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarLugaresCultoCSV implements ExcepcionAmigable{
 
     public static void importarLugaresCulto(File archivo) throws Exception {
-        // SQL basado en la función insert_lugares_culto (6 parámetros)
         String sql = "SELECT insert_lugares_culto(?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();

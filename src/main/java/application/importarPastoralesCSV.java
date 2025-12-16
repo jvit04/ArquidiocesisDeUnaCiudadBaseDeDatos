@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-
+//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarPastoralesCSV implements ExcepcionAmigable {
 
    public static void importarPastorales(File archivo) throws Exception {

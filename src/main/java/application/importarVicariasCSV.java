@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-
+//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarVicariasCSV implements ExcepcionAmigable {
 
     public static void importarVicarias(File archivo) throws Exception {

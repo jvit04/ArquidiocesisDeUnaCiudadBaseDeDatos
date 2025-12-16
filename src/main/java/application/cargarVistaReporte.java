@@ -7,7 +7,8 @@ import utilities.Paths;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+//Este metodo es el que permite cargar la vista desde la base de datos a la aplicación. Tiene su propia clase
+// VistaReporte con todas las columnas de la vista como atributos.
 public interface cargarVistaReporte {
     static ObservableList<VistaReporte> cargarReporte(){
         ObservableList<VistaReporte> vistas = FXCollections.observableArrayList();

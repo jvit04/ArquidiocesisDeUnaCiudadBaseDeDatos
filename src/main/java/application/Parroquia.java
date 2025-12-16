@@ -1,7 +1,7 @@
 package application;
 
 import java.time.LocalDate;
-
+//Clase que sirve para almacenar los datos que se registraran de la parroquia.
 public class Parroquia {
     public String nombre;
     public int vicaria;

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-
+//Clase con metodo que se encarga de guardar el archivo del reporte en el ordenador
 public class guardarArchivoEnRuta {
    public static void guardarArchivo(File fileDestino) {
         try {

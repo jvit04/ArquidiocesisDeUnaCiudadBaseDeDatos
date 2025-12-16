@@ -5,7 +5,9 @@ import utilities.Paths;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+//Metodo cargar, su proposito es que gracias a la función de la base obtener_vicarias devuelva una lista de
+//las vicarias que abarca la arquidiócesis, como es un dato relevante para el registro de la parroquia
+// se creó su propia clase Vicaria con atributos como nombre e id.
 public interface cargarVicarias {
     static List<Vicaria> cargarVicarias(){
         List<Vicaria> vicarias = new ArrayList<>();

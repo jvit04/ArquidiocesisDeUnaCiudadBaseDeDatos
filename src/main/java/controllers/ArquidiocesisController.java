@@ -25,7 +25,7 @@ import java.time.LocalDate;
 import java.util.regex.Pattern;
 
 import static utilities.guardarArchivoEnRuta.guardarArchivo;
-
+// Clase de los controladores java fx y los metodos que implementan
 public class ArquidiocesisController implements cargarClerigos, guardarParroquiaSQL , cargarVicarias {
     @FXML
     private AnchorPane ancorPane1;
@@ -180,16 +180,11 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
 
     private File archivoSeleccionado;
 
-
+//metodo que guarda los párrocos en el comboBox
     void setRegistroComboBoxParroco(){
         registroComboBoxParroco.getItems().clear();
-        registroComboBoxParroco.getItems().addAll(cargarClerigos.cargarClerigos());
+        registroComboBoxParroco.getItems().addAll(cargarClerigos.cargar());
     }
-
-void setRegistroChoiceBoxCiudad(){
-        registroChoiceBoxCiudad.getItems().clear();
-        registroChoiceBoxCiudad.getItems().addAll(cargarCiudades.cargarCiudades());
-}
 
 
     @FXML
@@ -207,6 +202,7 @@ void setRegistroChoiceBoxCiudad(){
         imageCatedral.setVisible(true);
 
     }
+    //metodo para regresar al menu principal
     @FXML
     void regresarInicio(ActionEvent event) {
         initialize();
@@ -267,7 +263,6 @@ void setRegistroChoiceBoxCiudad(){
         registroLabelFechaF.setVisible(false);
         registroDatePickerFF.setVisible(false);
         registroBotonEnviar.setVisible(false);
-
         registroChoiceBoxVicaria.getItems().addAll(cargarVicarias.cargarVicarias());
         registroChoiceBoxVicaria.getSelectionModel().selectFirst();
         registroChoiceBoxVicaria.getSelectionModel().selectedItemProperty().addListener((observable, valorAnterior, valorNuevo) -> {
@@ -303,6 +298,8 @@ void setRegistroChoiceBoxCiudad(){
             e.printStackTrace(); // Imprime el error si falla la conexión
         }
     }
+    //Este metodo permite configurar el ChoiceBox de ciudad para que cambie de acuerdo a la vicaria seleccionada
+    //Solo permite elección con la Vicaria Daule-Samborondón
     private void configurarCiudadSegunVicaria(String vicariaSeleccionada) {
         if (vicariaSeleccionada == null) return;
 
@@ -326,12 +323,14 @@ void setRegistroChoiceBoxCiudad(){
                 break;
         }
     }
-
+//El metodo selecciona la ciudad una vez elegida la vicaria
     private void bloquearYAsignarCiudad(String nombreCiudad) {
         registroChoiceBoxCiudad.setItems(FXCollections.observableArrayList(nombreCiudad));
         registroChoiceBoxCiudad.setValue(nombreCiudad); // se selecciona una ciudad automaticamente
         registroChoiceBoxCiudad.setDisable(true);
     }
+
+
     @FXML
     void crearParroquia(ActionEvent event) {
         registroComboBoxParroco.getSelectionModel().selectFirst();
@@ -456,6 +455,8 @@ void setRegistroChoiceBoxCiudad(){
             registroBotonEnviar.setDisable(false);
         }
     }
+    //Metodo que permite refrescar los datos, para evitar que se mantengan los datos recién usados.
+    // Es decir, una vez registrada la parroquia, limpia los datos para que nose pulse el boton enviar de manera indefinida.
     void refrescarCrearParroquia(){
         setRegistroComboBoxParroco();
         registroComboBoxParroco.getSelectionModel().selectFirst();
@@ -708,7 +709,7 @@ void setRegistroChoiceBoxCiudad(){
 
 
 
-    // Método auxiliar para mostrar alertas en JavaFX
+//     Método auxiliar para mostrar alertas en JavaFX
     private void mostrarAlerta(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);

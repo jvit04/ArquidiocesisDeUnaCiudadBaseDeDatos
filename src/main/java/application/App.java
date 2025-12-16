@@ -17,7 +17,7 @@ public class App extends Application {
 
         launch(args);
     }
-
+//metodo start de java FX que permite iniciar la aplicación
     @Override
     public void start(Stage stage) throws IOException {
         AnchorPane loader = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(Paths.ArquidiocesisApp)));
@@ -26,9 +26,9 @@ public class App extends Application {
         stage.setMinWidth(600);
         stage.setMinHeight(400);
         stage.setResizable(false);
-        Image icono = new Image(Objects.requireNonNull(getClass().getResourceAsStream(Paths.ImagenIconoApp)));
+        Image icono = new Image(Objects.requireNonNull(getClass().getResourceAsStream(Paths.ImagenIconoApp)));//icono de la aplicacion
         stage.getIcons().add(icono);
-        stage.setTitle("Arquidiócesis");
+        stage.setTitle("Arquidiócesis");//titulo de la barra superior
         stage.show();
 
     }

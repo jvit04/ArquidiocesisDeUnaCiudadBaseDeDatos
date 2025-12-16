@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.math.BigDecimal;
 import java.sql.*;
-
+//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarProyectosPastoralesCSV implements ExcepcionAmigable {
 
     public static void importarProyectosPastorales(File archivo) throws Exception {

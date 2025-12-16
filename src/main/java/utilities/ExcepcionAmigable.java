@@ -1,5 +1,5 @@
 package utilities;
-
+//Clase con metodo que devuelve una excepción legible para un usuario, al insertar archivos con duplicados.
 public interface ExcepcionAmigable {
     static void verificarErrorAmigable(java.sql.SQLException e) throws Exception {
         String estadoSQL = e.getSQLState();
