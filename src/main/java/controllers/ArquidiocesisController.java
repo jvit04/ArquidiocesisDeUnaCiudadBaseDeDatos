@@ -268,8 +268,8 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
         registroBotonEnviar.setVisible(false);
       registroChoiceBoxVicaria.getItems().addAll(cargarVicarias.cargarVicarias());
         registroChoiceBoxVicaria.getSelectionModel().selectFirst();
-        registroChoiceBoxVicaria.getSelectionModel().selectedItemProperty().addListener((observable, valorAntiguo, valorNuevo) -> {
-        });
+        registroChoiceBoxVicaria.getSelectionModel().selectedItemProperty().addListener((observable, valorAnterior, valorNuevo) -> {
+            configurarCiudadSegunVicaria(valorNuevo.toString());});
         txtFieldNombreParroquia.setText("");
         registroComboBoxParroco.setValue(null);
         registrotextFieldDireccion.setText("");
