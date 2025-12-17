@@ -7,10 +7,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.*;
-//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+
 public class importarClerigoCSV implements ExcepcionAmigable {
 
-  public  static void importarClerigo(File archivo) throws Exception {
+    public static void importarClerigo(File archivo) throws Exception {
         String sql = "SELECT insert_clerigo(?, ?, ?, ?, ?::DATE, ?::DATE, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
@@ -20,111 +23,94 @@ public class importarClerigoCSV implements ExcepcionAmigable {
             String linea;
             int numeroLinea = 0;
 
+            // --- 1. CONFIGURACIÓN DE FECHAS FLEXIBLE ---
+            DateTimeFormatter fmt = new DateTimeFormatterBuilder()
+                    .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                    .appendOptional(DateTimeFormatter.ofPattern("d/M/yyyy"))
+                    .appendOptional(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    .toFormatter();
+
             while ((linea = br.readLine()) != null) {
                 numeroLinea++;
                 String[] datos = linea.split(";", -1);
 
                 if (datos.length >= 8) {
 
-                    // -- 1. Nombres (Obligatorio) --
+                    // -- VALIDACIONES BÁSICAS --
                     String nombres = datos[0].trim().replace("\uFEFF", "");
-                    if (nombres.isEmpty()) {
-                        System.err.println("Línea " + numeroLinea + ": Nombre vacío. Registro omitido.");
-                        continue;
-                    }
+                    if (nombres.isEmpty()) continue;
 
-                    // -- 2. Apellidos (Obligatorio) --
                     String apellidos = datos[1].trim();
-                    if (apellidos.isEmpty()) {
-                        System.err.println("Línea " + numeroLinea + ": Apellido vacío. Registro omitido.");
-                        continue;
-                    }
+                    if (apellidos.isEmpty()) continue;
 
-                    // -- 3. Cédula (Obligatorio) --
+                    // --- 2. CORRECCIÓN CÉDULA ---
                     String cedula = datos[2].trim();
-                    if (cedula.isEmpty()) {
-                        System.err.println("Línea " + numeroLinea + ": Cédula vacía. Registro omitido.");
-                        continue;
+                    if (cedula.isEmpty()) continue;
+                    // Si tiene 9 dígitos y le falta el 0, se lo ponemos
+                    if (cedula.length() == 9 && !cedula.startsWith("0")) {
+                        cedula = "0" + cedula;
                     }
 
-                    // -- 4. Rol (Obligatorio) --
                     String rol = datos[3].trim();
-                    if (rol.isEmpty()) {
-                        System.err.println("Línea " + numeroLinea + ": Rol vacío. Registro omitido.");
-                        continue;
-                    }
+                    if (rol.isEmpty()) continue;
 
-                    // -- 5. Fecha Nacimiento (Obligatorio) --
                     String fechaNacStr = datos[4].trim();
-                    if (fechaNacStr.isEmpty()) {
-                        System.err.println("Línea " + numeroLinea + ": Fecha Nacimiento vacía. Registro omitido.");
-                        continue;
-                    }
+                    if (fechaNacStr.isEmpty()) continue;
 
-                    // -- 6. Fecha Ordenación (Obligatorio) --
                     String fechaOrdStr = datos[5].trim();
-                    if (fechaOrdStr.isEmpty()) {
-                        System.err.println("Línea " + numeroLinea + ": Fecha Ordenación vacía. Registro omitido.");
-                        continue;
-                    }
+                    if (fechaOrdStr.isEmpty()) continue;
 
                     try {
-                        // Asignación de parámetros
-
-                        // 1. Nombres
                         pstmt.setString(1, nombres);
-
-                        // 2. Apellidos (CORREGIDO: Antes era setInt)
                         pstmt.setString(2, apellidos);
-
-                        // 3. Cédula
                         pstmt.setString(3, cedula);
-
-                        // 4. Rol
                         pstmt.setString(4, rol);
 
-                        // 5. Fecha Nacimiento
-                        pstmt.setDate(5, Date.valueOf(fechaNacStr));
+                        // --- 3. PARSEO DE FECHAS ---
+                        LocalDate fechaNac = LocalDate.parse(fechaNacStr, fmt);
+                        pstmt.setDate(5, Date.valueOf(fechaNac));
 
-                        // 6. Fecha Ordenación
-                        pstmt.setDate(6, Date.valueOf(fechaOrdStr));
+                        LocalDate fechaOrd = LocalDate.parse(fechaOrdStr, fmt);
+                        pstmt.setDate(6, Date.valueOf(fechaOrd));
 
-                        // -- 7. Email (OPCIONAL/NULLABLE) --
+                        // -- Email --
                         String email = datos[6].trim();
                         if (email.isEmpty() || email.equalsIgnoreCase("NULL")) {
-                            pstmt.setNull(7, Types.VARCHAR); // Usamos VARCHAR o CLOB para 'text'
+                            pstmt.setNull(7, Types.VARCHAR);
                         } else {
                             pstmt.setString(7, email);
                         }
 
-                        // -- 8. Teléfono (OPCIONAL/NULLABLE) --
-                        String telefono = datos[7].trim(); // CORREGIDO: índice 7 (el octavo elemento)
+                        // --- 4. CORRECCIÓN TELÉFONO (Agregado) ---
+                        String telefono = datos[7].trim();
+
+                        // Lógica de rescate del cero para teléfonos:
+                        // Si tiene 9 dígitos (celular sin 0) u 8 (fijo sin 0) y no empieza con 0, lo agregamos.
+                        if (!telefono.isEmpty() && !telefono.equalsIgnoreCase("NULL")) {
+                            if ((telefono.length() == 9 || telefono.length() == 8) && !telefono.startsWith("0")) {
+                                telefono = "0" + telefono;
+                            }
+                        }
+
                         if (telefono.isEmpty() || telefono.equalsIgnoreCase("NULL")) {
                             pstmt.setNull(8, Types.VARCHAR);
                         } else {
                             pstmt.setString(8, telefono);
                         }
 
-                        // Añadir al lote
                         pstmt.addBatch();
 
-                    } catch (NumberFormatException e) {
-                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
-                    } catch (IllegalArgumentException e) {
-                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (java.time.format.DateTimeParseException e) {
+                        System.err.println("Error de formato de FECHA en línea " + numeroLinea + ": " + e.getParsedString());
+                    } catch (Exception e) {
+                        System.err.println("Error en línea " + numeroLinea + ": " + e.getMessage());
                     }
-                    catch (Exception e) {
-                        System.err.println("Error inesperado en línea " + numeroLinea + ": " + e.getMessage());
-                    }
-
-                } else {
-                    System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 8).");
                 }
             }
-            try{
+
+            try {
                 pstmt.executeBatch();
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 ExcepcionAmigable.verificarErrorAmigable(e);
             }
             System.out.println("Proceso de importación de Clérigos finalizado.");

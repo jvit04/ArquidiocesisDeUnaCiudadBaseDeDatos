@@ -10,8 +10,12 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
-public class importarRegistroSacramentoCSV implements ExcepcionAmigable  {
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+
+// Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
+public class importarRegistroSacramentoCSV implements ExcepcionAmigable {
 
     public static void importarRegistroSacramento(File archivo) throws Exception {
         String sql = "SELECT insert_registro_sacramento(?, ?::DATE, ?, ?)";
@@ -23,11 +27,16 @@ public class importarRegistroSacramentoCSV implements ExcepcionAmigable  {
             String linea;
             int numeroLinea = 0;
 
+            DateTimeFormatter fmt = new DateTimeFormatterBuilder()
+                    .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                    .appendOptional(DateTimeFormatter.ofPattern("d/M/yyyy"))
+                    .appendOptional(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    .toFormatter();
+
             while ((linea = br.readLine()) != null) {
                 numeroLinea++;
                 String[] datos = linea.split(";", -1);
 
-                // Verificamos que tenga las 4 columnas necesarias
                 if (datos.length >= 4) {
 
                     // -- 1. Tipo de Sacramento (Obligatorio) --
@@ -59,11 +68,13 @@ public class importarRegistroSacramentoCSV implements ExcepcionAmigable  {
                     }
 
                     try {
+                        // Asignación de parámetros
                         // 1. p_tipo_sacramento
                         pstmt.setString(1, tipo);
 
-                        // 2. p_fecha
-                        pstmt.setDate(2, Date.valueOf(fechaStr));
+                        // 2. p_fecha (Usando el formateador flexible)
+                        LocalDate fecha = LocalDate.parse(fechaStr, fmt);
+                        pstmt.setDate(2, Date.valueOf(fecha));
 
                         // 3. p_id_clerigo
                         pstmt.setInt(3, Integer.parseInt(idClerigoStr));
@@ -76,18 +87,20 @@ public class importarRegistroSacramentoCSV implements ExcepcionAmigable  {
 
                     } catch (NumberFormatException e) {
                         System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
-                    } catch (IllegalArgumentException e) {
-                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (java.time.format.DateTimeParseException e) {
+                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getParsedString());
+                    } catch (Exception e) {
+                        System.err.println("Error inesperado en línea " + numeroLinea + ": " + e.getMessage());
                     }
 
                 } else {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 4).");
                 }
             }
-            try{
+
+            try {
                 pstmt.executeBatch();
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 ExcepcionAmigable.verificarErrorAmigable(e);
             }
             System.out.println("Proceso de importación de Registro de Sacramentos finalizado.");

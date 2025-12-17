@@ -7,7 +7,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.*;
-//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+
+// Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarParroquiasCSV implements ExcepcionAmigable {
 
     public static void importarParroquias(File archivo) throws Exception {
@@ -20,10 +24,17 @@ public class importarParroquiasCSV implements ExcepcionAmigable {
             String linea;
             int numeroLinea = 0;
 
+            DateTimeFormatter fmt = new DateTimeFormatterBuilder()
+                    .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                    .appendOptional(DateTimeFormatter.ofPattern("d/M/yyyy"))
+                    .appendOptional(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    .toFormatter();
+
             while ((linea = br.readLine()) != null) {
                 numeroLinea++;
                 String[] datos = linea.split(";", -1);
 
+                // Verificamos que tenga las 9 columnas
                 if (datos.length >= 9) {
 
                     // -- 1. Nombre (Obligatorio) --
@@ -54,16 +65,7 @@ public class importarParroquiasCSV implements ExcepcionAmigable {
                         continue;
                     }
 
-                    // -- 5. Teléfono (OPCIONAL/NULLABLE) --
-                    String telefono = datos[4].trim();
-
-                    // -- 6. Email (OPCIONAL/NULLABLE) --
-                    String email = datos[5].trim();
-
-                    // -- 7. Sitio Web (OPCIONAL/NULLABLE) --
-                    String sitioWeb = datos[6].trim();
-
-                    // -- 8. Fecha Erección (Obligatorio) --
+                    // -- 8. Fecha Erección (Obligatorio - Validar antes de procesar) --
                     String fechaStr = datos[7].trim();
                     if (fechaStr.isEmpty()) {
                         System.err.println("Línea " + numeroLinea + ": Fecha de Erección vacía. Registro omitido.");
@@ -79,37 +81,43 @@ public class importarParroquiasCSV implements ExcepcionAmigable {
 
                     try {
                         // Asignación de parámetros
-
                         pstmt.setString(1, nombre);
                         pstmt.setInt(2, Integer.parseInt(idVicariaStr));
                         pstmt.setString(3, direccion);
                         pstmt.setString(4, ciudad);
 
-                        // Teléfono
-                        if (telefono.isEmpty() || telefono.equalsIgnoreCase("NULL")) {
-                            pstmt.setNull(5, Types.VARCHAR);
-                        } else {
+                        // -- 5. Teléfono (OPCIONAL con CORRECCIÓN) --
+                        String telefono = datos[4].trim();
+                        if (!telefono.isEmpty() && !telefono.equalsIgnoreCase("NULL")) {
+                            if ((telefono.length() == 9 || telefono.length() == 8) && !telefono.startsWith("0")) {
+                                telefono = "0" + telefono;
+                            }
                             pstmt.setString(5, telefono);
+                        } else {
+                            pstmt.setNull(5, Types.VARCHAR);
                         }
 
-                        // Email
+                        // -- 6. Email (OPCIONAL) --
+                        String email = datos[5].trim();
                         if (email.isEmpty() || email.equalsIgnoreCase("NULL")) {
                             pstmt.setNull(6, Types.VARCHAR);
                         } else {
                             pstmt.setString(6, email);
                         }
 
-                        // Sitio Web
+                        // -- 7. Sitio Web (OPCIONAL) --
+                        String sitioWeb = datos[6].trim();
                         if (sitioWeb.isEmpty() || sitioWeb.equalsIgnoreCase("NULL")) {
                             pstmt.setNull(7, Types.VARCHAR);
                         } else {
                             pstmt.setString(7, sitioWeb);
                         }
 
-                        // Fecha (Validación estricta)
-                        pstmt.setDate(8, Date.valueOf(fechaStr));
+                        // -- 8. Fecha Erección (Con Parseo Flexible) --
+                        LocalDate fecha = LocalDate.parse(fechaStr, fmt);
+                        pstmt.setDate(8, Date.valueOf(fecha));
 
-                        // ID Párroco
+                        // -- 9. ID Párroco --
                         pstmt.setInt(9, Integer.parseInt(idParrocoStr));
 
                         // Añadir al lote
@@ -117,19 +125,20 @@ public class importarParroquiasCSV implements ExcepcionAmigable {
 
                     } catch (NumberFormatException e) {
                         System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
-                    } catch (IllegalArgumentException e) {
-                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (java.time.format.DateTimeParseException e) {
+                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getParsedString());
+                    } catch (Exception e) {
+                        System.err.println("Error inesperado en línea " + numeroLinea + ": " + e.getMessage());
                     }
-
 
                 } else {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 9).");
                 }
             }
-            try{
+
+            try {
                 pstmt.executeBatch();
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 ExcepcionAmigable.verificarErrorAmigable(e);
             }
             System.out.println("Proceso de importación de Parroquias finalizado.");

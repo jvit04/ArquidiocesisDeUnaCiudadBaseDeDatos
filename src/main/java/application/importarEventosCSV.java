@@ -12,11 +12,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
-//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
+import java.time.temporal.ChronoField;
+
+// Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarEventosCSV implements ExcepcionAmigable {
 
-  public static void importarEventos(File archivo) throws Exception {
+    public static void importarEventos(File archivo) throws Exception {
+        // insert_evento tiene 6 parámetros
         String sql = "SELECT insert_evento(?, ?, ?::TIMESTAMP, ?::TIMESTAMP, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
@@ -25,7 +29,17 @@ public class importarEventosCSV implements ExcepcionAmigable {
 
             String linea;
             int numeroLinea = 0;
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+            // --- FORMATEADOR FLEXIBLE PARA FECHA Y HORA ---
+            DateTimeFormatter fmt = new DateTimeFormatterBuilder()
+                    .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                    .appendOptional(DateTimeFormatter.ofPattern("d/M/yyyy HH:mm:ss"))
+                    .appendOptional(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))
+                    .appendOptional(DateTimeFormatter.ofPattern("d/M/yyyy HH:mm"))
+                    .appendOptional(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                    .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                    .toFormatter();
 
             while ((linea = br.readLine()) != null) {
                 numeroLinea++;
@@ -85,39 +99,38 @@ public class importarEventosCSV implements ExcepcionAmigable {
                         // 2. p_categoria
                         pstmt.setString(2, categoria);
 
-                        // 3. p_fecha_hora_inicio
+                        // 3. p_fecha_hora_inicio (Usando el formateador flexible)
                         pstmt.setObject(3, LocalDateTime.parse(fechaIniStr, fmt));
 
-                        // 4. p_fecha_hora_fin
+                        // 4. p_fecha_hora_fin (Usando el formateador flexible)
                         pstmt.setObject(4, LocalDateTime.parse(fechaFinStr, fmt));
 
                         // 5. p_id_lugar_culto
                         pstmt.setInt(5, Integer.parseInt(idLugarStr));
 
                         // 6. p_presupuesto
-                        // Reemplazamos coma por punto por seguridad (ej: 10,50 -> 10.50)
                         pstmt.setBigDecimal(6, new BigDecimal(presupuestoStr.replace(",", ".")));
 
                         // Añadir al lote
                         pstmt.addBatch();
 
                     } catch (NumberFormatException e) {
-                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
-                    } catch (IllegalArgumentException e) {
-                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
-                    }
-                     catch (DateTimeParseException e) {
-                        System.err.println("Error de formato de Fecha/Hora en línea " + numeroLinea + ": " + e.getMessage());
+                        System.err.println("Error numérico (ID o Presupuesto) en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (DateTimeParseException e) {
+                        System.err.println("Error de formato de Fecha/Hora en línea " + numeroLinea + ": '" + e.getParsedString() + "'. Verifique el formato (ej: 28/03/2024 10:00:00).");
+                    } catch (Exception e) {
+                        System.err.println("Error inesperado en línea " + numeroLinea + ": " + e.getMessage());
                     }
 
                 } else {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 6).");
                 }
             }
-            try{
+
+
+            try {
                 pstmt.executeBatch();
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 ExcepcionAmigable.verificarErrorAmigable(e);
             }
             System.out.println("Proceso de importación de Eventos finalizado.");

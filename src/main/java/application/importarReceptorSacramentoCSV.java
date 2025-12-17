@@ -9,7 +9,8 @@ import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
+
+// Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarReceptorSacramentoCSV implements ExcepcionAmigable {
 
     public static void importarReceptorSacramento(File archivo) throws Exception {
@@ -35,6 +36,10 @@ public class importarReceptorSacramentoCSV implements ExcepcionAmigable {
                         continue;
                     }
 
+                    if (cedula.length() == 9 && !cedula.startsWith("0")) {
+                        cedula = "0" + cedula;
+                    }
+
                     // -- 2. ID Registro Sacramento (Obligatorio - Integer) --
                     String idRegistroStr = datos[1].trim();
                     if (idRegistroStr.isEmpty()) {
@@ -43,6 +48,7 @@ public class importarReceptorSacramentoCSV implements ExcepcionAmigable {
                     }
 
                     try {
+                        // Asignación de parámetros
                         // 1. p_cedula
                         pstmt.setString(1, cedula);
 
@@ -54,17 +60,18 @@ public class importarReceptorSacramentoCSV implements ExcepcionAmigable {
 
                     } catch (NumberFormatException e) {
                         System.err.println("Error de formato numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (Exception e) {
+                        System.err.println("Error inesperado en línea " + numeroLinea + ": " + e.getMessage());
                     }
-
 
                 } else {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 2).");
                 }
             }
-            try{
+
+            try {
                 pstmt.executeBatch();
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 ExcepcionAmigable.verificarErrorAmigable(e);
             }
             System.out.println("Proceso de importación de Receptor Sacramento finalizado.");

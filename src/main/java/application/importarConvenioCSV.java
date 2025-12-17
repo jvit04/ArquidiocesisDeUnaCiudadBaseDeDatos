@@ -7,11 +7,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.*;
-//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+
+// Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarConvenioCSV implements ExcepcionAmigable {
 
     public static void importarConvenio(File archivo) throws Exception {
-        // La consulta llama a la función insert_convenio con 8 parámetros según tu imagen
+        // insert_convenio recibe 8 parámetros
         String sql = "SELECT insert_convenio(?, ?, ?, ?::DATE, ?::DATE, ?, ?, ?)";
 
         try (Connection connection = ConexionBD.conectar();
@@ -21,6 +25,12 @@ public class importarConvenioCSV implements ExcepcionAmigable {
             String linea;
             int numeroLinea = 0;
 
+            DateTimeFormatter fmt = new DateTimeFormatterBuilder()
+                    .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                    .appendOptional(DateTimeFormatter.ofPattern("d/M/yyyy"))
+                    .appendOptional(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    .toFormatter();
+
             while ((linea = br.readLine()) != null) {
                 numeroLinea++;
                 String[] datos = linea.split(";", -1);
@@ -28,52 +38,52 @@ public class importarConvenioCSV implements ExcepcionAmigable {
                 // Verificamos que tenga las 8 columnas necesarias
                 if (datos.length >= 8) {
 
-                    // 1. Nombre (Obligatorio) - Limpiamos BOM por si es la primera línea
+                    // -- 1. Nombre --
                     String nombre = datos[0].trim().replace("\uFEFF", "");
                     if (nombre.isEmpty()) {
                         System.err.println("Línea " + numeroLinea + ": Nombre vacío. Registro omitido.");
                         continue;
                     }
 
-                    // 2. Institución (Obligatorio)
+                    // -- 2. Institución --
                     String institucion = datos[1].trim();
                     if (institucion.isEmpty()) {
                         System.err.println("Línea " + numeroLinea + ": Institución vacía. Registro omitido.");
                         continue;
                     }
 
-                    // 3. Objetivo (Obligatorio - text)
+                    // -- 3. Objetivo --
                     String objetivo = datos[2].trim();
                     if (objetivo.isEmpty()) {
                         System.err.println("Línea " + numeroLinea + ": Objetivo vacío. Registro omitido.");
                         continue;
                     }
 
-                    // 4. Fecha Firmante (Obligatorio)
-                    String fechaFirma = datos[3].trim();
-                    if (fechaFirma.isEmpty()) {
+                    // -- 4. Fecha Firmante (Obligatorio) --
+                    String fechaFirmaStr = datos[3].trim();
+                    if (fechaFirmaStr.isEmpty()) {
                         System.err.println("Línea " + numeroLinea + ": Fecha de firma vacía. Registro omitido.");
                         continue;
                     }
 
-                    // 5. Fecha Vencimiento (OPCIONAL/NULLABLE)
-                    String fechaVencimiento = datos[4].trim();
+                    // -- 5. Fecha Vencimiento (OPCIONAL/NULLABLE) --
+                    String fechaVencimientoStr = datos[4].trim();
 
-                    // 6. ID Vicaria (Obligatorio - int)
+                    // -- 6. ID Vicaria --
                     String idVicariaStr = datos[5].trim();
                     if (idVicariaStr.isEmpty()) {
                         System.err.println("Línea " + numeroLinea + ": ID Vicaria vacío. Registro omitido.");
                         continue;
                     }
 
-                    // 7. ID Clerigo (Obligatorio - int)
+                    // -- 7. ID Clérigo --
                     String idClerigoStr = datos[6].trim();
                     if (idClerigoStr.isEmpty()) {
                         System.err.println("Línea " + numeroLinea + ": ID Clérigo vacío. Registro omitido.");
                         continue;
                     }
 
-                    // 8. Estado (Obligatorio)
+                    // -- 8. Estado --
                     String estado = datos[7].trim();
                     if (estado.isEmpty()) {
                         System.err.println("Línea " + numeroLinea + ": Estado vacío. Registro omitido.");
@@ -81,33 +91,39 @@ public class importarConvenioCSV implements ExcepcionAmigable {
                     }
 
                     try {
-                        // Asignación de valores al PreparedStatement en orden estricto de la función
+                        // Asignación de parámetros
 
-                        pstmt.setString(1, nombre);       // p_nombre
-                        pstmt.setString(2, institucion);  // p_institucion
-                        pstmt.setString(3, objetivo);     // p_objetivo
-                        pstmt.setDate(4, Date.valueOf(fechaFirma)); // p_fecha_firmante
+                        pstmt.setString(1, nombre);
+                        pstmt.setString(2, institucion);
+                        pstmt.setString(3, objetivo);
 
-                        // Lógica para Fecha Vencimiento (Único campo NULLABLE)
-                        if (fechaVencimiento.isEmpty() || fechaVencimiento.equalsIgnoreCase("NULL")) {
+                        // -- 4. Fecha Firmante
+                        LocalDate fechaFirma = LocalDate.parse(fechaFirmaStr, fmt);
+                        pstmt.setDate(4, Date.valueOf(fechaFirma));
+
+                        // -- 5. Fecha Vencimiento
+                        if (fechaVencimientoStr.isEmpty() || fechaVencimientoStr.equalsIgnoreCase("NULL")) {
                             pstmt.setNull(5, Types.DATE);
                         } else {
-                            pstmt.setDate(5, Date.valueOf(fechaVencimiento));
+                            LocalDate fechaVenc = LocalDate.parse(fechaVencimientoStr, fmt);
+                            pstmt.setDate(5, Date.valueOf(fechaVenc));
                         }
 
                         // Parseo de enteros
-                        pstmt.setInt(6, Integer.parseInt(idVicariaStr)); // p_id_vicaria
-                        pstmt.setInt(7, Integer.parseInt(idClerigoStr)); // p_id_clerigo
+                        pstmt.setInt(6, Integer.parseInt(idVicariaStr));
+                        pstmt.setInt(7, Integer.parseInt(idClerigoStr));
 
-                        pstmt.setString(8, estado); // p_estado
+                        pstmt.setString(8, estado);
 
                         // Añadir al lote
                         pstmt.addBatch();
 
                     } catch (NumberFormatException e) {
                         System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
-                    } catch (IllegalArgumentException e) {
-                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (java.time.format.DateTimeParseException e) {
+                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getParsedString());
+                    } catch (Exception e) {
+                        System.err.println("Error inesperado en línea " + numeroLinea + ": " + e.getMessage());
                     }
 
                 } else {
@@ -115,10 +131,9 @@ public class importarConvenioCSV implements ExcepcionAmigable {
                 }
             }
 
-            try{
+            try {
                 pstmt.executeBatch();
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 ExcepcionAmigable.verificarErrorAmigable(e);
             }
             System.out.println("Proceso de importación de Convenios finalizado.");

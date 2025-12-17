@@ -10,7 +10,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-//Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
+
+// Permite importar desde un CSV los datos de la tabla correspondiente a la base de datos.
 public class importarVicariasCSV implements ExcepcionAmigable {
 
     public static void importarVicarias(File archivo) throws Exception {
@@ -46,8 +47,18 @@ public class importarVicariasCSV implements ExcepcionAmigable {
                         continue;
                     }
 
-                    // -- 4. Teléfono (Obligatorio) --
+                    // -- 4. Teléfono (Obligatorio con corrección) --
                     String telefono = datos[3].trim();
+
+                    // CORRECCIÓN DE TELÉFONO:
+                    // Si Excel quitó el cero (9 dígitos), lo reponemos.
+                    if (!telefono.isEmpty()) {
+                        if (telefono.length() == 9 && !telefono.startsWith("0")) {
+                            telefono = "0" + telefono;
+                        }
+                    }
+
+                    // Validación final de vacío
                     if (telefono.isEmpty()) {
                         System.err.println("Línea " + numeroLinea + ": Teléfono vacío. Registro omitido.");
                         continue;
@@ -61,7 +72,7 @@ public class importarVicariasCSV implements ExcepcionAmigable {
 
                         // 2. p_descripcion (Único NULLABLE)
                         if (descripcion.isEmpty() || descripcion.equalsIgnoreCase("NULL")) {
-                            pstmt.setNull(2, Types.VARCHAR); // Usamos VARCHAR o CLOB según corresponda a 'text'
+                            pstmt.setNull(2, Types.VARCHAR);
                         } else {
                             pstmt.setString(2, descripcion);
                         }
@@ -69,27 +80,24 @@ public class importarVicariasCSV implements ExcepcionAmigable {
                         // 3. p_email
                         pstmt.setString(3, email);
 
-                        // 4. p_telefono
+                        // 4. p_telefono (Corregido)
                         pstmt.setString(4, telefono);
 
                         // Añadir al lote
                         pstmt.addBatch();
 
-                    } catch (NumberFormatException e) {
-                        System.err.println("Error numérico (ID) en línea " + numeroLinea + ": " + e.getMessage());
-                    } catch (IllegalArgumentException e) {
-                        System.err.println("Error de formato de fecha en línea " + numeroLinea + ": " + e.getMessage());
+                    } catch (Exception e) {
+                        System.err.println("Error inesperado en línea " + numeroLinea + ": " + e.getMessage());
                     }
-
 
                 } else {
                     System.err.println("Línea " + numeroLinea + " omitida: Columnas insuficientes (se esperan 4).");
                 }
             }
-            try{
+
+            try {
                 pstmt.executeBatch();
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 ExcepcionAmigable.verificarErrorAmigable(e);
             }
             System.out.println("Proceso de importación de Vicarías finalizado.");
