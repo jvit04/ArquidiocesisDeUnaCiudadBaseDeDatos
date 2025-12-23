@@ -596,7 +596,7 @@ public class ArquidiocesisController implements cargarClerigos, guardarParroquia
             tablaReporte.setItems(vistaReporteObservableList);
         }
 
-        private File archivoTemporal;
+
     @FXML
     void examinarRuta(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
